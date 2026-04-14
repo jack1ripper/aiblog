@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -127,4 +128,40 @@
   html {
     @apply font-sans;
   }
+}
+
+/* Markdown Editor Dark Mode Overrides */
+.dark .markdown-editor .editor-toolbar {
+  background-color: hsl(var(--background));
+  border-color: hsl(var(--border));
+}
+.dark .markdown-editor .editor-toolbar > button {
+  color: hsl(var(--foreground));
+  border-color: transparent;
+}
+.dark .markdown-editor .editor-toolbar > button:hover,
+.dark .markdown-editor .editor-toolbar > button.active {
+  background-color: hsl(var(--accent));
+  border-color: hsl(var(--border));
+}
+.dark .markdown-editor .CodeMirror {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border));
+}
+.dark .markdown-editor .CodeMirror-cursor {
+  border-left-color: hsl(var(--foreground));
+}
+.dark .markdown-editor .editor-preview {
+  background-color: hsl(var(--background));
+}
+.dark .markdown-editor .editor-preview-side {
+  border-color: hsl(var(--border));
+}
+.dark .markdown-editor .editor-statusbar {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+}
+.dark .markdown-editor .cm-s-easymde .CodeMirror-code {
+  color: hsl(var(--foreground));
 }

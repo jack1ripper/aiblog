@@ -1,0 +1,111 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
+  const session = await getServerSession(authOptions);
+  const isAdmin = !!session && (session.user as { role?: string }).role === "admin";
+
+  const post = await prisma.post.findUnique({
+    where: { id },
+    include: {
+      category: true,
+      tags: true,
+      author: { select: { name: true, email: true } },
+    },
+  });
+
+  if (!post) {
+    return NextResponse.json({ error: "Not found", errorCode: "POST_404" }, { status: 404 });
+  }
+
+  if (!post.published && !isAdmin) {
+    return NextResponse.json({ error: "Unauthorized", errorCode: "AUTH_001" }, { status: 401 });
+  }
+
+  return NextResponse.json(post);
+}
+
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getServerSession(authOptions);
+  if (!session || (session.user as { role?: string }).role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized", errorCode: "AUTH_001" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const body = await req.json();
+  const { title, slug, content, excerpt, coverImage, published, categoryId, tagNames } = body;
+
+  const existingPost = await prisma.post.findUnique({ where: { id } });
+  if (!existingPost) {
+    return NextResponse.json({ error: "Post not found", errorCode: "POST_404" }, { status: 404 });
+  }
+
+  if (slug) {
+    const existing = await prisma.post.findFirst({
+      where: { slug, NOT: { id } },
+    });
+    if (existing) {
+      return NextResponse.json(
+        { error: "Slug already exists", errorCode: "POST_409" },
+        { status: 409 }
+      );
+    }
+  }
+
+  // Rebuild tags: disconnect all then reconnect
+  await prisma.post.update({
+    where: { id },
+    data: {
+      tags: {
+        set: [],
+      },
+    },
+  });
+
+  const connectTags = tagNames?.length
+    ? {
+        connectOrCreate: tagNames.map((name: string) => ({
+          where: { name },
+          create: { name },
+        })),
+      }
+    : undefined;
+
+  const post = await prisma.post.update({
+    where: { id },
+    data: {
+      title,
+      slug,
+      content,
+      excerpt,
+      coverImage,
+      published,
+      categoryId: categoryId || null,
+      tags: connectTags,
+    },
+    include: { category: true, tags: true },
+  });
+
+  return NextResponse.json(post);
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await getServerSession(authOptions);
+  if (!session || (session.user as { role?: string }).role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized", errorCode: "AUTH_001" }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  const existing = await prisma.post.findUnique({ where: { id } });
+  if (!existing) {
+    return NextResponse.json({ error: "Post not found", errorCode: "POST_404" }, { status: 404 });
+  }
+
+  await prisma.post.delete({ where: { id } });
+  return NextResponse.json({ success: true });
+}

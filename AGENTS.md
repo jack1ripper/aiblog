@@ -1,5 +1,68 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# AI 开发规范（AGENTS.md）
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+## 自动执行指令（每次新对话必读）
+
+> 本文件已被 Kimi Code 自动读取。你**必须**立即执行以下步骤，**不允许**先问用户"你想做什么"。
+
+### Step 1: 读取路由器
+读取 `project-docs/00-index.md`。
+
+### Step 2: 任务路由
+根据 `00-index.md` 中的"任务路由表"，判断当前上下文可能涉及的任务类型，并**只读取**对应的 2-4 个相关文档。
+- 如果无法判断任务类型，默认读取：`01-overview.md` + `02-requirements.md` + `03-tech-stack.md`
+
+### Step 3: 读取任务清单
+读取 `tasks/current.md`，找出所有未勾选的任务。
+
+### Step 4: 汇报理解（必须完成此步才能进入下一步）
+向用户发送以下格式的理解摘要：
+
+```
+## 项目理解确认
+
+**核心愿景**：
+**当前未完成任务**：
+**相关技术约束**：
+**本次对话建议处理的任务**：
+
+请确认以上理解是否正确，或告诉我本次对话要处理的具体任务编号。
+```
+
+**在收到用户确认之前，禁止写任何代码、禁止修改任何文件。**
+
+---
+
+## 核心红线
+
+1. **禁止依赖记忆**：不假设任何项目背景，一切引用文档或代码原文
+2. **不确定时说不知道**：禁止编造答案
+3. **文档优先于实现**：技术决策必须引用 `project-docs/` 原文
+4. **小步验证**：一次只做 1-2 个 task，测试不过不进入下一步
+
+## 多子项目红线
+
+- `AGENTS.md` 和 `project-docs/` 必须在当前子项目根目录
+- **禁止**在外层父目录加载文档
+
+## 通用代码纪律
+
+- 优先使用已有依赖，新增依赖必须说明理由并验证真实存在
+- 禁止硬编码密钥、拼接 SQL、执行用户输入的字符串
+- 每个 task 完成后：运行测试 → 更新 `tasks/current.md` → `git commit` → **`git push`**
+- 涉及架构变更必须写入 `decisions/YYYY-MM-DD-<标题>.md`
+
+## 自动测试与推送纪律（强制执行）
+
+> 每完成一个 task，**自动运行构建**（`npm run build`），然后以**严格 QA 视角**自查前后端 bug：
+> - **前端**：样式生效、响应式、交互状态、空/错状态、hydration 错误
+> - **后端**：权限完整、数据不泄漏、参数边界、异常状态码正确
+>
+> 发现 bug **立即修复**，构建和自测全部通过后再 `git commit` 并 **`git push`**。
+> 如果 push 失败，明确报告原因，禁止假装已完成。
+
+## 质量门禁（必须暂停并请示）
+
+- 删除/大幅修改核心逻辑
+- 引入新的外部依赖
+- 测试覆盖率下降
+- 需求与实现冲突
