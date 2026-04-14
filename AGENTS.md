@@ -51,6 +51,23 @@
 - 每个 task 完成后：运行测试 → 更新 `tasks/current.md` → `git commit` → **`git push`**
 - 涉及架构变更必须写入 `decisions/YYYY-MM-DD-<标题>.md`
 
+## Next.js / React 前端开发红线（强制）
+
+> 以下问题**必须避免再次踩坑**。修改相关代码前，**优先查阅对应依赖/框架官方文档**，禁止凭记忆假设 API 行为。
+
+### 1. react-markdown 渲染规则
+- **禁止依赖 `props.inline`**：react-markdown v9+ 的 `code` 组件已移除 `inline` prop。
+- 区分 block/inline code 时，应通过自定义 `pre` 组件 + Context（或类似机制），利用 `pre > code` 的父子结构判断，**禁止**把 `<div>` 渲染进 `<p>` 导致非法嵌套和 hydration error。
+
+### 2. Hydration 一致性（Client Component SSR）
+- Client Component 中若使用浏览器 API（`window`、`document`、`navigator`）、`useTheme()`、随机数或 locale 相关格式化，**必须保证 SSR 与客户端首次渲染输出一致**。
+- **推荐做法**：使用 `mounted` state + `useEffect` 控制差异逻辑，未 mount 前渲染静态 fallback，杜绝 hydration mismatch。
+- **禁止**在渲染路径里写 `typeof window !== 'undefined'` 分支。
+
+### 3. 主题样式适配
+- **禁止**在通用 UI 组件（按钮、浮层、图标）中硬编码 `text-white`、`bg-white/5` 等固定颜色。
+- 必须使用项目设计系统 token（如 `bg-muted`、`text-foreground`、`border-border`、`bg-accent`），确保 light/dark 双主题下均可见。
+
 ## 自动测试与推送纪律（强制执行）
 
 > 每完成一个 task，**自动运行构建**（`npm run build`），然后以**严格 QA 视角**自查前后端 bug：

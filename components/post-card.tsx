@@ -1,7 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import { Eye } from "lucide-react";
@@ -13,7 +11,6 @@ interface PostCardProps {
     slug: string;
     content: string;
     excerpt: string | null;
-    coverImage: string | null;
     published: boolean;
     createdAt: Date;
     category: { name: string } | null;
@@ -24,51 +21,45 @@ interface PostCardProps {
 
 export function PostCard({ post }: PostCardProps) {
   return (
-    <Card className="group overflow-hidden transition-all duration-150 hover:shadow-md">
-      <Link href={`/posts/${post.slug}`}>
-        {post.coverImage ? (
-          <div className="relative aspect-video w-full overflow-hidden">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-110"
-            />
-          </div>
-        ) : (
-          <div className="aspect-video w-full bg-muted" />
+    <article className="group py-8">
+      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+        <time>{format(new Date(post.createdAt), "yyyy年MM月dd日", { locale: zhCN })}</time>
+        {(post.views ?? 0) > 0 && (
+          <>
+            <span className="text-border">·</span>
+            <span className="inline-flex items-center gap-1">
+              <Eye className="h-3.5 w-3.5" />
+              {post.views}
+            </span>
+          </>
         )}
+        {post.category && (
+          <>
+            <span className="text-border">·</span>
+            <Badge variant="secondary" className="text-xs">{post.category.name}</Badge>
+          </>
+        )}
+      </div>
+
+      <Link href={`/posts/${post.slug}`} className="mt-3 block">
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground transition-colors duration-150 group-hover:text-primary">
+          {post.title}
+        </h2>
       </Link>
-      <CardContent className="p-5">
-        <div className="mb-2 flex flex-wrap items-center gap-2">
-          {post.category && (
-            <Badge variant="secondary">{post.category.name}</Badge>
-          )}
+
+      <p className="mt-3 line-clamp-2 text-base leading-relaxed text-muted-foreground">
+        {post.excerpt || post.content.slice(0, 200) + "..."}
+      </p>
+
+      {post.tags.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
           {post.tags.map((tag) => (
-            <Badge key={tag.name} variant="outline">
+            <Badge key={tag.name} variant="outline" className="text-xs">
               {tag.name}
             </Badge>
           ))}
         </div>
-        <Link href={`/posts/${post.slug}`}>
-          <h3 className="mb-2 text-xl font-semibold leading-tight transition-colors duration-150 hover:text-primary">
-            {post.title}
-          </h3>
-        </Link>
-        <p className="mb-3 line-clamp-3 text-sm text-muted-foreground">
-          {post.excerpt || post.content.slice(0, 300) + "..."}
-        </p>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <time>{format(new Date(post.createdAt), "yyyy年MM月dd日", { locale: zhCN })}</time>
-          {(post.views ?? 0) > 0 && (
-            <span className="inline-flex items-center gap-1">
-              <Eye className="h-3 w-3" />
-              {post.views}
-            </span>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+      )}
+    </article>
   );
 }

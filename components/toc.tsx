@@ -59,12 +59,12 @@ export function Toc({ items }: TocProps) {
         目录
       </p>
       <ul className="space-y-1 border-l border-border">
-        {headings.map((item) => (
+        {headings.map((item, idx) => (
           <li
-            key={item.id}
+            key={`${item.id || "toc"}-${idx}`}
             className={cn(
-              "relative transition-colors",
-              item.level === 3 && "pl-3"
+              "relative pl-3 transition-colors",
+              item.level === 3 && "pl-6"
             )}
           >
             {activeId === item.id && (

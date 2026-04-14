@@ -27,7 +27,7 @@ export default async function HomePage() {
           暂无文章，稍后再来看看吧
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mx-auto max-w-3xl divide-y divide-border">
           {posts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}

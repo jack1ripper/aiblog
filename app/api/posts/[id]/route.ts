@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { generateSlug, ensureUniqueSlug } from "@/lib/slug";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -37,14 +38,18 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const { id } = await params;
   const body = await req.json();
-  const { title, slug, content, excerpt, coverImage, published, categoryId, tagNames } = body;
+  const { title, slug: rawSlug, content, excerpt, coverImage, published, categoryId, tagNames } = body;
 
   const existingPost = await prisma.post.findUnique({ where: { id } });
   if (!existingPost) {
     return NextResponse.json({ error: "Post not found", errorCode: "POST_404" }, { status: 404 });
   }
 
-  if (slug) {
+  let slug = rawSlug?.trim() || existingPost.slug;
+  if (!rawSlug?.trim() && title && title !== existingPost.title) {
+    slug = generateSlug(title);
+    slug = await ensureUniqueSlug(slug, id);
+  } else if (rawSlug?.trim()) {
     const existing = await prisma.post.findFirst({
       where: { slug, NOT: { id } },
     });

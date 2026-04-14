@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { generateSlug, ensureUniqueSlug } from "@/lib/slug";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -40,15 +41,21 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { title, slug, content, excerpt, coverImage, published, categoryId, tagNames } = body;
+  const { title, slug: rawSlug, content, excerpt, coverImage, published, categoryId, tagNames } = body;
 
-  if (!title || !slug || !content) {
+  if (!title || !content) {
     return NextResponse.json({ error: "Missing required fields", errorCode: "POST_400" }, { status: 400 });
   }
 
-  const existing = await prisma.post.findUnique({ where: { slug } });
-  if (existing) {
-    return NextResponse.json({ error: "Slug already exists", errorCode: "POST_409" }, { status: 409 });
+  let slug = rawSlug?.trim();
+  if (!slug) {
+    slug = generateSlug(title);
+    slug = await ensureUniqueSlug(slug);
+  } else {
+    const existing = await prisma.post.findUnique({ where: { slug } });
+    if (existing) {
+      return NextResponse.json({ error: "Slug already exists", errorCode: "POST_409" }, { status: 409 });
+    }
   }
 
   const connectTags = tagNames?.length

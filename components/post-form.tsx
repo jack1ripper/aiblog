@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { MarkdownEditor } from "./markdown-editor";
+import { generateSlug } from "@/lib/slugify";
 
 interface PostFormProps {
   initialData?: {
@@ -39,14 +40,6 @@ export function PostForm({ initialData, categories }: PostFormProps) {
   const [error, setError] = useState("");
   const slugTouched = useRef(!!initialData?.slug);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  function generateSlug(text: string) {
-    return text
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, "-")
-      .replace(/^-+|-+$/g, "");
-  }
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -140,24 +133,19 @@ export function PostForm({ initialData, categories }: PostFormProps) {
           onChange={(e) => {
             const newTitle = e.target.value;
             setTitle(newTitle);
-            if (!slugTouched.current) {
-              setSlug(generateSlug(newTitle));
-            }
+            setSlug(generateSlug(newTitle));
           }}
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="slug">Slug（URL 标识）</Label>
+        <Label htmlFor="slug">URL 标识（自动生成）</Label>
         <Input
           id="slug"
           value={slug}
-          onChange={(e) => {
-            setSlug(e.target.value);
-            slugTouched.current = true;
-          }}
-          required
+          disabled
+          className="bg-muted text-muted-foreground"
         />
       </div>
 
