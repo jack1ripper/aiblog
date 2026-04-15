@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session || (session.user as { role?: string }).role !== "admin") {
+export async function GET(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  if (!token || token.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized", errorCode: "AUTH_001" }, { status: 401 });
   }
 
-  const userEmail = session.user?.email;
+  const userEmail = typeof token.email === "string" ? token.email : null;
   if (!userEmail) {
-    return NextResponse.json({ error: "Email not found in session", errorCode: "AUTH_002" }, { status: 401 });
+    return NextResponse.json({ error: "Email not found in token", errorCode: "AUTH_002" }, { status: 401 });
   }
 
   const user = await prisma.user.findUnique({
@@ -27,14 +26,14 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session || (session.user as { role?: string }).role !== "admin") {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  if (!token || token.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized", errorCode: "AUTH_001" }, { status: 401 });
   }
 
-  const userEmail = session.user?.email;
+  const userEmail = typeof token.email === "string" ? token.email : null;
   if (!userEmail) {
-    return NextResponse.json({ error: "Email not found in session", errorCode: "AUTH_002" }, { status: 401 });
+    return NextResponse.json({ error: "Email not found in token", errorCode: "AUTH_002" }, { status: 401 });
   }
 
   const body = await req.json();

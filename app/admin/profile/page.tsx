@@ -28,7 +28,12 @@ export default function AdminProfilePage() {
   useEffect(() => {
     fetch("/api/user")
       .then(async (res) => {
-        if (!res.ok) throw new Error("加载失败");
+        if (!res.ok) {
+          const text = await res.text().catch(() => "Unknown error");
+          // eslint-disable-next-line no-console
+          console.error("Profile load failed:", res.status, text);
+          throw new Error(`加载失败 (${res.status})`);
+        }
         return res.json();
       })
       .then((data) => {
