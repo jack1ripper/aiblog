@@ -21,6 +21,7 @@ interface Post {
   title: string;
   slug: string;
   published: boolean;
+  pinned: boolean;
   createdAt: string;
 }
 
@@ -146,6 +147,9 @@ export default function AdminPostsPage() {
                   >
                     {post.title}
                   </Link>
+                  {post.pinned && (
+                    <Badge variant="default" className="ml-2">置顶</Badge>
+                  )}
                 </TableCell>
                 <TableCell>
                   {post.published ? (

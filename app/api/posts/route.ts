@@ -18,7 +18,10 @@ export async function GET(req: NextRequest) {
   const [posts, total] = await Promise.all([
     prisma.post.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy: [
+        { pinned: "desc" },
+        { createdAt: "desc" },
+      ],
       skip,
       take: limit,
       include: {
@@ -40,7 +43,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { title, slug: rawSlug, content, excerpt, coverImage, published, categoryId, tagNames } = body;
+  const { title, slug: rawSlug, content, excerpt, coverImage, published, pinned, categoryId, tagNames } = body;
 
   if (!title || !content) {
     return NextResponse.json({ error: "Missing required fields", errorCode: "POST_400" }, { status: 400 });
@@ -74,6 +77,7 @@ export async function POST(req: NextRequest) {
       excerpt,
       coverImage,
       published: published ?? false,
+      pinned: pinned ?? false,
       authorId: token.sub as string,
       categoryId: categoryId || null,
       tags: connectTags,

@@ -20,6 +20,7 @@ interface PostFormProps {
     excerpt: string;
     coverImage: string;
     published: boolean;
+    pinned?: boolean;
     categoryId?: string;
     tagNames: string[];
   };
@@ -36,6 +37,7 @@ export function PostForm({ initialData, categories }: PostFormProps) {
   const published = initialData?.published ?? false;
   const [categoryId, setCategoryId] = useState(initialData?.categoryId || "");
   const [tags, setTags] = useState(initialData?.tagNames.join(", ") || "");
+  const [pinned, setPinned] = useState(initialData?.pinned ?? false);
   const [loadingTarget, setLoadingTarget] = useState<"draft" | "publish" | null>(null);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -74,6 +76,7 @@ export function PostForm({ initialData, categories }: PostFormProps) {
       excerpt,
       coverImage,
       published: willPublish,
+      pinned,
       categoryId: categoryId || undefined,
       tagNames: tags.split(",").map((t) => t.trim()).filter(Boolean),
     };
@@ -212,6 +215,19 @@ export function PostForm({ initialData, categories }: PostFormProps) {
             placeholder="技术, 生活, 教程"
           />
         </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input
+          id="pinned"
+          type="checkbox"
+          checked={pinned}
+          onChange={(e) => setPinned(e.target.checked)}
+          className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+        />
+        <Label htmlFor="pinned" className="cursor-pointer text-sm font-medium">
+          置顶文章
+        </Label>
       </div>
 
       <div className="space-y-2">

@@ -37,7 +37,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const { id } = await params;
   const body = await req.json();
-  const { title, slug: rawSlug, content, excerpt, coverImage, published, categoryId, tagNames } = body;
+  const { title, slug: rawSlug, content, excerpt, coverImage, published, pinned, categoryId, tagNames } = body;
 
   const existingPost = await prisma.post.findUnique({ where: { id } });
   if (!existingPost) {
@@ -88,6 +88,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       excerpt,
       coverImage,
       published,
+      pinned: pinned ?? existingPost.pinned,
       categoryId: categoryId || null,
       tags: connectTags,
     },

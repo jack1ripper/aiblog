@@ -15,6 +15,7 @@ interface PostCardProps {
     category: { name: string } | null;
     tags: { name: string }[];
     views?: number;
+    pinned?: boolean;
   };
 }
 
@@ -40,6 +41,11 @@ export function PostCard({ post }: PostCardProps) {
           </div>
 
           <div className="min-w-0 flex-1">
+            {post.pinned && (
+              <span className="mb-2 inline-flex items-center rounded bg-primary/10 px-1.5 py-0.5 text-[11px] font-medium text-primary">
+                置顶
+              </span>
+            )}
             {/* Meta row */}
             <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
               <span className="sm:hidden">

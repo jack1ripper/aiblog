@@ -32,6 +32,7 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
           excerpt: post.excerpt || "",
           coverImage: post.coverImage || "",
           published: post.published,
+          pinned: post.pinned,
           categoryId: post.categoryId || undefined,
           tagNames: post.tags.map((t) => t.name),
         }}

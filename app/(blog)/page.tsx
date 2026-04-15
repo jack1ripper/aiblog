@@ -9,7 +9,10 @@ import { AnimatedBackground } from "@/components/animated-background";
 export default async function HomePage() {
   const posts = await prisma.post.findMany({
     where: { published: true },
-    orderBy: { createdAt: "desc" },
+    orderBy: [
+      { pinned: "desc" },
+      { createdAt: "desc" },
+    ],
     include: {
       category: true,
       tags: true,
