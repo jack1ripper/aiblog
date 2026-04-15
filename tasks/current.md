@@ -109,14 +109,14 @@
 
 ### TASK-206: OpenGraph 动态图生成
 - **优先级**: 中
-- **状态**: ⬜ 待办（原三期遗留）
+- **状态**: ✅ 已完成
 - **描述**:
   - 为每篇文章自动生成带标题、作者、站点品牌的社交分享图（1200×630）。
   - 使用 `@vercel/og` 或 `satori` 在 Edge Runtime 动态生成 SVG → PNG。
 - **验收标准**:
-  - [ ] 访问 `/api/og?title=xxx` 返回 PNG 图片。
-  - [ ] 文章详情页 `metadata.openGraph.images` 指向该动态图。
-  - [ ] OG 图包含文章标题、作者名、站点 Logo/头像、品牌色背景。
+  - [x] 访问 `/api/og?title=xxx` 返回 PNG 图片。
+  - [x] 文章详情页 `metadata.openGraph.images` 指向该动态图。
+  - [x] OG 图包含文章标题、作者名、站点 Logo/头像、品牌色背景。
 
 ### TASK-207: 置顶文章（Pinned Post）
 - **优先级**: 中
