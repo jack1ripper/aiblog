@@ -4,6 +4,7 @@ import { MarkdownRenderer } from "@/components/markdown-renderer";
 import { Toc } from "@/components/toc";
 import { MobileToc } from "@/components/mobile-toc";
 import { GiscusComments } from "@/components/giscus-comments";
+import { AuthorCard } from "@/components/author-card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
@@ -38,7 +39,7 @@ export default async function PostPage({ params }: PostPageProps) {
     include: {
       category: true,
       tags: true,
-      author: { select: { name: true } },
+      author: { select: { name: true, image: true, bio: true, email: true } },
     },
   });
 
@@ -150,6 +151,17 @@ export default async function PostPage({ params }: PostPageProps) {
               <div />
             )}
           </div>
+
+          {post.author && (
+            <div className="my-10">
+              <AuthorCard
+                name={post.author.name || "匿名作者"}
+                email={post.author.email}
+                image={post.author.image}
+                bio={post.author.bio}
+              />
+            </div>
+          )}
 
           <GiscusComments />
         </article>

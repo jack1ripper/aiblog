@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
-import { FileText, PlusCircle, LayoutDashboard, LogOut } from "lucide-react";
+import { FileText, PlusCircle, LayoutDashboard, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default async function AdminLayout({
@@ -35,6 +35,13 @@ export default async function AdminLayout({
           >
             <PlusCircle className="h-4 w-4" />
             新建文章
+          </Link>
+          <Link
+            href="/admin/profile"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+          >
+            <User className="h-4 w-4" />
+            个人设置
           </Link>
           <Link
             href="/"
