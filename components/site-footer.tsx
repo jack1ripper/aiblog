@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Rss, Mail } from "lucide-react";
-import { NewsletterForm } from "@/components/newsletter-form";
+// import { NewsletterForm } from "@/components/newsletter-form";
 
 const footerLinks = [
   { href: "/", label: "首页" },
@@ -152,7 +152,7 @@ export function SiteFooter() {
             <p className="text-xs text-muted-foreground/60">
               © {new Date().getFullYear()} Dusk³
             </p>
-            <NewsletterForm />
+            {/* <NewsletterForm /> */}
           </div>
         </div>
       </div>
