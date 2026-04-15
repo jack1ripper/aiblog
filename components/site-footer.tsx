@@ -54,9 +54,6 @@ export function SiteFooter() {
               <Link href="/" className="text-lg font-bold tracking-tight">
                 Dusk³
               </Link>
-              <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
-                Script & Style — 记录前端开发与生活随笔。基于 Next.js 构建，追求简洁与高效。
-              </p>
             </div>
 
             <div className="flex gap-8 sm:justify-end">
