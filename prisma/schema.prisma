@@ -56,25 +56,26 @@ model VerificationToken {
 }
 
 model Post {
-  id          String    @id @default(cuid())
-  title       String
-  slug        String    @unique
-  content     String
-  excerpt     String?
-  coverImage  String?
-  published   Boolean   @default(false)
-  pinned      Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  author      User      @relation(fields: [authorId], references: [id])
-  authorId    String
-  tags        Tag[]
-  category    Category? @relation(fields: [categoryId], references: [id])
-  categoryId  String?
-  views       Int       @default(0)
-  seriesId    String?
-  seriesOrder Int       @default(0)
-  series      Series?   @relation(fields: [seriesId], references: [id])
+  id                String    @id @default(cuid())
+  title             String
+  slug              String    @unique
+  content           String
+  excerpt           String?
+  coverImage        String?
+  published         Boolean   @default(false)
+  pinned            Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  author            User      @relation(fields: [authorId], references: [id])
+  authorId          String
+  tags              Tag[]
+  category          Category? @relation(fields: [categoryId], references: [id])
+  categoryId        String?
+  views             Int       @default(0)
+  seriesId          String?
+  seriesOrder       Int       @default(0)
+  series            Series?   @relation(fields: [seriesId], references: [id])
+  newsletterSentAt  DateTime?
 }
 
 model Tag {

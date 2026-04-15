@@ -186,8 +186,12 @@ export function PostForm({ initialData, categories, series }: PostFormProps) {
       });
 
       if (res.ok) {
+        const data = await res.json();
         if (typeof window !== "undefined") {
           localStorage.removeItem(draftKey);
+        }
+        if (data.newsletterSent) {
+          alert(`文章已发布，邮件提醒已发送给 ${data.newsletter?.sent || 0} 位订阅者。`);
         }
         router.push("/jack/posts");
         router.refresh();

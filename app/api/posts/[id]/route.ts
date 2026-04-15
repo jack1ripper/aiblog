@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
 import { generateSlug, ensureUniqueSlug } from "@/lib/slug";
+import { notifySubscribersOnPublish } from "@/lib/email";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -44,6 +45,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!existingPost) {
     return NextResponse.json({ error: "Post not found", errorCode: "POST_404" }, { status: 404 });
   }
+
+  const shouldNotify = !existingPost.published && published === true && !existingPost.newsletterSentAt;
 
   let slug = rawSlug?.trim() || existingPost.slug;
   if (!rawSlug?.trim() && title && title !== existingPost.title) {
@@ -97,6 +100,15 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     },
     include: { category: true, tags: true },
   });
+
+  if (shouldNotify) {
+    try {
+      const newsletter = await notifySubscribersOnPublish(post);
+      return NextResponse.json({ ...post, newsletterSent: true, newsletter });
+    } catch {
+      return NextResponse.json({ ...post, newsletterSent: false });
+    }
+  }
 
   return NextResponse.json(post);
 }

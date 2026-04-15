@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
 import { generateSlug, ensureUniqueSlug } from "@/lib/slug";
+import { notifySubscribersOnPublish } from "@/lib/email";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -86,6 +87,15 @@ export async function POST(req: NextRequest) {
     },
     include: { category: true, tags: true },
   });
+
+  if (post.published && !post.newsletterSentAt) {
+    try {
+      const newsletter = await notifySubscribersOnPublish(post);
+      return NextResponse.json({ ...post, newsletterSent: true, newsletter }, { status: 201 });
+    } catch {
+      return NextResponse.json({ ...post, newsletterSent: false }, { status: 201 });
+    }
+  }
 
   return NextResponse.json(post, { status: 201 });
 }

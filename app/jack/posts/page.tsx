@@ -84,9 +84,13 @@ export default function AdminPostsPage() {
         const data = await res.json();
         throw new Error(data.error || "发布失败");
       }
+      const data = await res.json();
       setPosts((prev) =>
         prev.map((p) => (p.id === post.id ? { ...p, published: true } : p))
       );
+      if (data.newsletterSent) {
+        alert(`文章已发布，邮件提醒已发送给 ${data.newsletter?.sent || 0} 位订阅者。`);
+      }
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : "发布失败");
     }
