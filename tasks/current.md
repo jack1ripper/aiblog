@@ -72,16 +72,16 @@
 
 ### TASK-203: RSS 订阅增强
 - **优先级**: 高
-- **状态**: ⬜ 待办
+- **状态**: ✅ 已完成
 - **描述**:
   - 已有 `/feed.xml` 路由，但需补全 Atom 标准字段、文章摘要、分类标签。
   - 在站点 Footer 和文章页显眼位置增加 RSS 订阅入口（图标 + 链接）。
   - 可选补充 JSON Feed (`/feed.json`)，方便现代阅读器订阅。
 - **验收标准**:
-  - [ ] `feed.xml` 包含 `<author>`、`<category>`、`<guid>`、`<pubDate>`、`<description>`（excerpt 或前 200 字）。
-  - [ ] 文章详情页和 Footer 增加 RSS 图标链接。
-  - [ ] 新增 `/feed.json` 路由，输出 JSON Feed v1 格式。
-  - [ ] 通过 RSS 校验工具（如 validator.w3.org/feed）无报错。
+  - [x] `feed.xml` 包含 `<author>`、`<category>`、`<guid>`、`<pubDate>`、`<description>`（excerpt 或前 200 字）。
+  - [x] 文章详情页和 Footer 增加 RSS 图标链接。
+  - [x] 新增 `/feed.json` 路由，输出 JSON Feed v1 格式。
+  - [x] 通过 RSS 校验工具（如 validator.w3.org/feed）无报错。
 
 ### TASK-204: 文章搜索（全文 + 快捷键）
 - **优先级**: 高
