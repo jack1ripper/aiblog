@@ -125,19 +125,21 @@ export function SiteFooter() {
                   >
                     <Mail className="h-4 w-4" />
                   </a>
-                  <button
-                    onClick={handleCopyRss}
-                    className="text-muted-foreground transition-colors hover:text-foreground"
-                    aria-label="RSS"
-                  >
-                    <Rss className="h-4 w-4" />
-                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={handleCopyRss}
+                      className="text-muted-foreground transition-colors hover:text-foreground"
+                      aria-label="RSS"
+                    >
+                      <Rss className="h-4 w-4" />
+                    </button>
+                    {showCopied && (
+                      <span className="absolute left-1/2 top-6 z-50 w-max max-w-[220px] -translate-x-1/2 rounded-md bg-foreground px-2 py-1 text-xs text-background shadow-lg">
+                        已复制 RSS 地址，可粘贴到阅读器订阅
+                      </span>
+                    )}
+                  </div>
                 </div>
-                {showCopied && (
-                  <p className="text-xs text-foreground">
-                    已复制 RSS 地址，可粘贴到阅读器订阅
-                  </p>
-                )}
               </div>
             </div>
           </div>
