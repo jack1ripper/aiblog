@@ -94,7 +94,7 @@ export default function AdminAnnouncementsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">站点通知</h1>
-        <Link href="/admin/announcements/new">
+        <Link href="/jack/announcements/new">
           <Button>新建通知</Button>
         </Link>
       </div>
@@ -160,7 +160,7 @@ export default function AdminAnnouncementsPage() {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Link href={`/admin/announcements/${item.id}/edit`}>
+                    <Link href={`/jack/announcements/${item.id}/edit`}>
                       <Button size="sm" variant="outline">
                         编辑
                       </Button>

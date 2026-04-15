@@ -67,7 +67,7 @@ export function AnnouncementForm({ initialData }: AnnouncementFormProps) {
       if (!res.ok) {
         throw new Error(data.error || "保存失败");
       }
-      router.push("/admin/announcements");
+      router.push("/jack/announcements");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "保存失败");
     } finally {
@@ -149,7 +149,7 @@ export function AnnouncementForm({ initialData }: AnnouncementFormProps) {
         <Button type="submit" disabled={submitting}>
           {submitting ? "保存中..." : isEdit ? "保存修改" : "创建通知"}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.push("/admin/announcements")}>
+        <Button type="button" variant="outline" onClick={() => router.push("/jack/announcements")}>
           取消
         </Button>
       </div>

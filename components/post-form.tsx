@@ -189,7 +189,7 @@ export function PostForm({ initialData, categories, series }: PostFormProps) {
         if (typeof window !== "undefined") {
           localStorage.removeItem(draftKey);
         }
-        router.push("/admin/posts");
+        router.push("/jack/posts");
         router.refresh();
       } else {
         const data = await res.json();
@@ -401,7 +401,7 @@ export function PostForm({ initialData, categories, series }: PostFormProps) {
         >
           {isPublishing ? "发布中..." : initialData?.id ? "更新并发布" : "发布文章"}
         </Button>
-        <Button type="button" variant="ghost" onClick={() => router.push("/admin/posts")}>
+        <Button type="button" variant="ghost" onClick={() => router.push("/jack/posts")}>
           取消
         </Button>
       </div>

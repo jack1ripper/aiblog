@@ -52,10 +52,10 @@ export function SiteFooter() {
           <div className="grid gap-8 sm:grid-cols-2">
             <div>
               <Link href="/" className="text-lg font-bold tracking-tight">
-                我的博客
+                Dusk³
               </Link>
               <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
-                记录技术、生活与思考。基于 Next.js 构建的个人博客，追求简洁与高效。
+                Script & Style — 记录前端开发与生活随笔。基于 Next.js 构建，追求简洁与高效。
               </p>
             </div>
 
@@ -122,7 +122,7 @@ export function SiteFooter() {
               </div>
             </div>
             <p className="mt-8 text-center text-xs text-muted-foreground sm:text-left">
-              © {new Date().getFullYear()} 我的博客. All rights reserved.
+              © {new Date().getFullYear()} Dusk³. All rights reserved.
             </p>
           </div>
         </div>

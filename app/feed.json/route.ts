@@ -20,7 +20,7 @@ export async function GET() {
 
   const feed = {
     version: "https://jsonfeed.org/version/1.1",
-    title: "我的博客",
+    title: "Dusk³",
     home_page_url: siteUrl,
     feed_url: `${siteUrl}/feed.json`,
     language: "zh-CN",

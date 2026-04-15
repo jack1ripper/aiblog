@@ -24,8 +24,9 @@ function getHeadingId(text: React.ReactNode) {
     .join("");
   return plain
     .toLowerCase()
+    .trim()
     .replace(/\s+/g, "-")
-    .replace(/[^\w\-]/g, "");
+    .replace(/[^\w\u4e00-\u9fa5\-]/g, "");
 }
 
 function CopyButton({ code }: { code: string }) {

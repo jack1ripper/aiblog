@@ -115,7 +115,7 @@ export default function AdminPostsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">文章管理</h1>
-        <Link href="/admin/posts/new">
+        <Link href="/jack/posts/new">
           <Button>新建文章</Button>
         </Link>
       </div>
@@ -172,7 +172,7 @@ export default function AdminPostsPage() {
                         {publishingId === post.id ? "发布中..." : "发布"}
                       </Button>
                     )}
-                    <Link href={`/admin/posts/${post.id}/edit`}>
+                    <Link href={`/jack/posts/${post.id}/edit`}>
                       <Button size="sm" variant="outline" className="border-border hover:border-transparent hover:bg-muted">编辑</Button>
                     </Link>
                     <Button

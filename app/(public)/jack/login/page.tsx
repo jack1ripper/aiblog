@@ -11,8 +11,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@example.com");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -28,8 +28,10 @@ export default function LoginPage() {
     });
 
     if (result?.ok) {
-      router.push("/admin/posts");
+      router.push("/jack/posts");
       router.refresh();
+    } else if (result?.error === "TOO_MANY_ATTEMPTS") {
+      setError("尝试次数过多，请 15 分钟后再试");
     } else {
       setError("邮箱或密码错误");
     }

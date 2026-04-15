@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "我的博客",
-  description: "基于 Next.js 构建的个人博客",
+  title: "Dusk³",
+  description: "Script & Style — 记录前端开发与生活随笔",
 };
 
 export default function RootLayout({

@@ -4,6 +4,49 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
+type RateLimitEntry = {
+  count: number;
+  resetAt: number;
+};
+
+const rateLimitMap = new Map<string, RateLimitEntry>();
+
+function isRateLimited(key: string, maxAttempts = 5, windowMs = 15 * 60 * 1000): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(key);
+
+  if (!entry) {
+    rateLimitMap.set(key, { count: 1, resetAt: now + windowMs });
+    return false;
+  }
+
+  if (now > entry.resetAt) {
+    rateLimitMap.set(key, { count: 1, resetAt: now + windowMs });
+    return false;
+  }
+
+  entry.count++;
+  if (entry.count > maxAttempts) {
+    return true;
+  }
+  rateLimitMap.set(key, entry);
+  return false;
+}
+
+function getClientIp(req: unknown): string | null {
+  if (!req) return null;
+  const r = req as { headers?: Record<string, unknown>; socket?: { remoteAddress?: string } };
+  const forwarded = r.headers?.["x-forwarded-for"];
+  if (forwarded) {
+    return typeof forwarded === "string"
+      ? forwarded.split(",")[0].trim()
+      : Array.isArray(forwarded)
+      ? forwarded[0]
+      : null;
+  }
+  return r.socket?.remoteAddress || null;
+}
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -13,9 +56,19 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           return null;
+        }
+
+        const emailKey = credentials.email.toLowerCase();
+        const ip = getClientIp(req);
+
+        if (isRateLimited(`email:${emailKey}`)) {
+          throw new Error("TOO_MANY_ATTEMPTS");
+        }
+        if (ip && isRateLimited(`ip:${ip}`)) {
+          throw new Error("TOO_MANY_ATTEMPTS");
         }
 
         const user = await prisma.user.findUnique({
@@ -66,6 +119,6 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "/login",
+    signIn: "/jack/login",
   },
 };

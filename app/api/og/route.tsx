@@ -5,7 +5,7 @@ export const runtime = "edge";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const title = searchParams.get("title") || "我的博客";
+  const title = searchParams.get("title") || "Dusk³";
   const author = searchParams.get("author") || "";
 
   return new ImageResponse(
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
             letterSpacing: "0.05em",
           }}
         >
-          我的博客
+          Dusk³
         </div>
 
         {/* Title */}

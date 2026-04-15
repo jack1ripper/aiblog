@@ -68,9 +68,9 @@ export function MobileToc() {
       {open && (
         <div className="mt-2 rounded-lg border border-border bg-background p-3">
           <ul className="space-y-1">
-            {headings.map((item) => (
+            {headings.map((item, idx) => (
               <li
-                key={item.id}
+                key={`${item.id || "toc"}-${idx}`}
                 className={cn(
                   "transition-colors",
                   item.level === 3 && "pl-3"
