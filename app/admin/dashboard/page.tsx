@@ -121,24 +121,32 @@ export default function AdminDashboardPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex h-48 items-end gap-2 sm:gap-4">
-            {trend.map((item) => {
-              const heightPercent = maxTrend ? (item.count / maxTrend) * 100 : 0;
-              return (
-                <div key={item.date} className="flex flex-1 flex-col items-center gap-2">
-                  <div
-                    className="w-full max-w-[40px] rounded-md bg-primary/80 transition-all hover:bg-primary"
-                    style={{ height: `${Math.max(heightPercent, 4)}%` }}
-                    aria-label={`${item.date} ${item.count} 次访问`}
-                    title={`${item.date}: ${item.count} 次访问`}
-                  />
-                  <div className="text-[10px] text-muted-foreground sm:text-xs">
-                    {format(new Date(item.date), "MM/dd")}
+          {trend.every((t) => t.count === 0) ? (
+            <div className="flex h-48 flex-col items-center justify-center text-sm text-muted-foreground">
+              <span>近 7 天暂无访问数据</span>
+              <span className="text-xs">文章页被访问后会自动记录</span>
+            </div>
+          ) : (
+            <div className="flex h-48 items-end gap-2 sm:gap-4">
+              {trend.map((item) => {
+                const heightPercent = maxTrend ? (item.count / maxTrend) * 100 : 0;
+                const barHeight = `${Math.max(heightPercent, 4)}%`;
+                return (
+                  <div key={item.date} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
+                    <div
+                      className="w-full max-w-[40px] rounded-md bg-primary/80 transition-all hover:bg-primary"
+                      style={{ height: barHeight, minHeight: "8px" }}
+                      aria-label={`${item.date} ${item.count} 次访问`}
+                      title={`${item.date}: ${item.count} 次访问`}
+                    />
+                    <div className="text-[10px] text-muted-foreground sm:text-xs">
+                      {format(new Date(item.date), "MM/dd")}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </CardContent>
       </Card>
 
