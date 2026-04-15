@@ -12,6 +12,7 @@ import { zhCN } from "date-fns/locale";
 import { Eye, Rss, ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { ReadingProgress } from "@/components/reading-progress";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import { SeriesNav } from "@/components/series-nav";
 
 interface PostPageProps {
@@ -94,6 +95,7 @@ export default async function PostPage({ params }: PostPageProps) {
   return (
     <div className="container mx-auto px-4 py-10">
       <ReadingProgress />
+      <ScrollToTop />
       <div className="mx-auto flex max-w-6xl gap-12">
         <article className="min-w-0 flex-1">
           <header className="mb-8">
