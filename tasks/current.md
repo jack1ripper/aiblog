@@ -120,13 +120,13 @@
 
 ### TASK-207: 置顶文章（Pinned Post）
 - **优先级**: 中
-- **状态**: ⬜ 待办（原三期遗留）
+- **状态**: ✅ 已完成
 - **描述**:
   - 后台可勾选「置顶」，置顶文章在首页列表最上方显示，并带「置顶」徽标。
 - **验收标准**:
-  - [ ] `Post` 模型新增 `pinned` Boolean 字段（默认 `false`）。
-  - [ ] 首页查询按 `pinned DESC, createdAt DESC` 排序。
-  - [ ] 置顶文章卡片左上角显示「置顶」标签。
+  - [x] `Post` 模型新增 `pinned` Boolean 字段（默认 `false`）。
+  - [x] 首页查询按 `pinned DESC, createdAt DESC` 排序。
+  - [x] 置顶文章卡片左上角显示「置顶」标签。
 
 ### TASK-208: Newsletter / 邮件订阅
 - **优先级**: 中
