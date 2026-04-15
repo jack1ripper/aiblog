@@ -19,7 +19,7 @@ async function main() {
     create: { name: "技术" },
   });
 
-  const categoryThinking = await prisma.category.upsert({
+  await prisma.category.upsert({
     where: { name: "随笔" },
     update: {},
     create: { name: "随笔" },

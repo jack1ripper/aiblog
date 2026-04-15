@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { writeFile } from "fs/promises";
 import { mkdir } from "fs/promises";
 import path from "path";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME_PREFIX = "image/";
+const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session || (session.user as { role?: string }).role !== "admin") {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  if (!token || token.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized", errorCode: "AUTH_001" }, { status: 401 });
   }
 
@@ -30,6 +30,14 @@ export async function POST(req: NextRequest) {
   if (file.size > MAX_FILE_SIZE) {
     return NextResponse.json(
       { error: "File size exceeds 5MB limit", errorCode: "UPLOAD_003" },
+      { status: 400 }
+    );
+  }
+
+  const ext = path.extname(file.name).toLowerCase();
+  if (!ALLOWED_EXTENSIONS.includes(ext)) {
+    return NextResponse.json(
+      { error: "Only JPG, PNG, GIF, WEBP are allowed", errorCode: "UPLOAD_004" },
       { status: 400 }
     );
   }

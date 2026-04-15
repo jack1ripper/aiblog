@@ -16,13 +16,15 @@ export function MobileToc() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const elements = Array.from(document.querySelectorAll("article h2, article h3"));
-    const parsed = elements.map((el) => ({
-      id: el.id,
-      text: el.textContent || "",
-      level: el.tagName === "H2" ? 2 : 3,
-    }));
-    setHeadings(parsed);
+    queueMicrotask(() => {
+      const elements = Array.from(document.querySelectorAll("article h2, article h3"));
+      const parsed = elements.map((el) => ({
+        id: el.id,
+        text: el.textContent || "",
+        level: el.tagName === "H2" ? 2 : 3,
+      }));
+      setHeadings(parsed);
+    });
   }, []);
 
   useEffect(() => {

@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { Eye, Rss, ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { ReadingProgress } from "@/components/reading-progress";
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -71,6 +72,7 @@ export default async function PostPage({ params }: PostPageProps) {
 
   return (
     <div className="container mx-auto px-4 py-10">
+      <ReadingProgress />
       <div className="mx-auto flex max-w-6xl gap-12">
         <article className="min-w-0 flex-1">
           <header className="mb-8">
@@ -96,11 +98,20 @@ export default async function PostPage({ params }: PostPageProps) {
                 <Eye className="h-3.5 w-3.5" />
                 {post.views + 1} 阅读
               </span>
+              <span className="hidden sm:inline">·</span>
+              <Link
+                href="/feed.xml"
+                className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
+              >
+                <Rss className="h-3.5 w-3.5" />
+                RSS
+              </Link>
             </div>
           </header>
 
           {post.coverImage && (
             <div className="mb-8 overflow-hidden rounded-xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={post.coverImage}
                 alt={post.title}
@@ -121,15 +132,16 @@ export default async function PostPage({ params }: PostPageProps) {
             {prevPost ? (
               <Link
                 href={`/posts/${prevPost.slug}`}
-                className="group flex flex-col rounded-xl border border-border bg-card p-4 transition-all duration-150 hover:border-primary/30 hover:shadow-sm"
+                className="group relative flex flex-col rounded-xl border border-border/60 bg-muted/30 p-5 transition-all duration-200 hover:border-primary/40 hover:bg-muted/50"
               >
-                <span className="mb-1 flex items-center text-xs text-muted-foreground">
-                  <ChevronLeft className="mr-1 h-3.5 w-3.5" />
+                <span className="mb-2 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors group-hover:text-foreground">
+                  <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
                   上一篇
                 </span>
-                <span className="line-clamp-1 font-medium text-foreground transition-colors group-hover:text-primary">
+                <span className="line-clamp-2 font-medium text-foreground transition-colors group-hover:text-primary">
                   {prevPost.title}
                 </span>
+                <div className="absolute left-0 top-1/2 h-0 w-0.5 -translate-y-1/2 rounded-full bg-primary opacity-0 transition-all duration-200 group-hover:h-6 group-hover:opacity-100" />
               </Link>
             ) : (
               <div />
@@ -137,15 +149,16 @@ export default async function PostPage({ params }: PostPageProps) {
             {nextPost ? (
               <Link
                 href={`/posts/${nextPost.slug}`}
-                className="group flex flex-col items-end rounded-xl border border-border bg-card p-4 text-right transition-all duration-150 hover:border-primary/30 hover:shadow-sm"
+                className="group relative flex flex-col items-end rounded-xl border border-border/60 bg-muted/30 p-5 text-right transition-all duration-200 hover:border-primary/40 hover:bg-muted/50"
               >
-                <span className="mb-1 flex items-center text-xs text-muted-foreground">
+                <span className="mb-2 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors group-hover:text-foreground">
                   下一篇
-                  <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                 </span>
-                <span className="line-clamp-1 font-medium text-foreground transition-colors group-hover:text-primary">
+                <span className="line-clamp-2 font-medium text-foreground transition-colors group-hover:text-primary">
                   {nextPost.title}
                 </span>
+                <div className="absolute right-0 top-1/2 h-0 w-0.5 -translate-y-1/2 rounded-full bg-primary opacity-0 transition-all duration-200 group-hover:h-6 group-hover:opacity-100" />
               </Link>
             ) : (
               <div />

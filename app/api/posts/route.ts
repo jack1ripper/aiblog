@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
 import { generateSlug, ensureUniqueSlug } from "@/lib/slug";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const session = await getServerSession(authOptions);
-  const isAdmin = !!session && (session.user as { role?: string }).role === "admin";
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const isAdmin = !!token && token.role === "admin";
 
   const publishedOnly = !isAdmin || searchParams.get("published") !== "false";
   const page = parseInt(searchParams.get("page") || "1", 10);
@@ -35,8 +34,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session || (session.user as { role?: string }).role !== "admin") {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  if (!token || token.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized", errorCode: "AUTH_001" }, { status: 401 });
   }
 
@@ -75,7 +74,7 @@ export async function POST(req: NextRequest) {
       excerpt,
       coverImage,
       published: published ?? false,
-      authorId: (session.user as { id: string }).id,
+      authorId: token.sub as string,
       categoryId: categoryId || null,
       tags: connectTags,
     },

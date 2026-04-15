@@ -3,16 +3,12 @@
 import { useEffect, useState } from "react";
 
 export function GiscusComments() {
-  const [config, setConfig] = useState<{ repo?: string; repoId?: string; category?: string; categoryId?: string } | null>(null);
-
-  useEffect(() => {
-    setConfig({
-      repo: process.env.NEXT_PUBLIC_GISCUS_REPO,
-      repoId: process.env.NEXT_PUBLIC_GISCUS_REPO_ID,
-      category: process.env.NEXT_PUBLIC_GISCUS_CATEGORY || "General",
-      categoryId: process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID,
-    });
-  }, []);
+  const [config] = useState(() => ({
+    repo: process.env.NEXT_PUBLIC_GISCUS_REPO,
+    repoId: process.env.NEXT_PUBLIC_GISCUS_REPO_ID,
+    category: process.env.NEXT_PUBLIC_GISCUS_CATEGORY || "General",
+    categoryId: process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID,
+  }));
 
   useEffect(() => {
     if (!config?.repo || !config.repoId || !config.categoryId) return;

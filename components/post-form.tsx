@@ -33,12 +33,11 @@ export function PostForm({ initialData, categories }: PostFormProps) {
   const [content, setContent] = useState(initialData?.content || "");
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || "");
   const [coverImage, setCoverImage] = useState(initialData?.coverImage || "");
-  const [published, setPublished] = useState(initialData?.published ?? false);
+  const published = initialData?.published ?? false;
   const [categoryId, setCategoryId] = useState(initialData?.categoryId || "");
   const [tags, setTags] = useState(initialData?.tagNames.join(", ") || "");
   const [loadingTarget, setLoadingTarget] = useState<"draft" | "publish" | null>(null);
   const [error, setError] = useState("");
-  const slugTouched = useRef(!!initialData?.slug);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -55,8 +54,8 @@ export function PostForm({ initialData, categories }: PostFormProps) {
       if (data.url) {
         setCoverImage(data.url);
       }
-    } catch (err: any) {
-      setError(err?.message || "上传失败");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "上传失败");
     } finally {
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -96,8 +95,8 @@ export function PostForm({ initialData, categories }: PostFormProps) {
         const data = await res.json();
         setError(data.error || "保存失败，请稍后重试");
       }
-    } catch (err: any) {
-      setError(err?.message || "网络错误");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "网络错误");
     }
 
     setLoadingTarget(null);
@@ -133,7 +132,9 @@ export function PostForm({ initialData, categories }: PostFormProps) {
           onChange={(e) => {
             const newTitle = e.target.value;
             setTitle(newTitle);
-            setSlug(generateSlug(newTitle));
+            if (!initialData?.id) {
+              setSlug(generateSlug(newTitle));
+            }
           }}
           required
         />
@@ -179,6 +180,7 @@ export function PostForm({ initialData, categories }: PostFormProps) {
           />
         </div>
         {coverImage && (
+          // eslint-disable-next-line @next/next/no-img-element
           <img src={coverImage} alt="封面预览" className="mt-2 h-32 rounded-md object-cover" />
         )}
       </div>

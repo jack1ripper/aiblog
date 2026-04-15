@@ -66,8 +66,8 @@ export default function AdminPostsPage() {
         throw new Error(data.error || "删除失败");
       }
       setPosts((prev) => prev.filter((p) => p.id !== id));
-    } catch (err: any) {
-      alert(err?.message || "删除失败");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "删除失败");
     }
   }
 
@@ -86,8 +86,8 @@ export default function AdminPostsPage() {
       setPosts((prev) =>
         prev.map((p) => (p.id === post.id ? { ...p, published: true } : p))
       );
-    } catch (err: any) {
-      alert(err?.message || "发布失败");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "发布失败");
     }
     setPublishingId(null);
   }

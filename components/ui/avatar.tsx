@@ -18,6 +18,7 @@ export function Avatar({ src, alt = "", fallback = "", className = "" }: AvatarP
       className={`relative inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted ${className}`}
     >
       {src && !error ? (
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={src}
           alt={alt}

@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
 import { generateSlug, ensureUniqueSlug } from "@/lib/slug";
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  const session = await getServerSession(authOptions);
-  const isAdmin = !!session && (session.user as { role?: string }).role === "admin";
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const isAdmin = !!token && token.role === "admin";
 
   const post = await prisma.post.findUnique({
     where: { id },
@@ -31,8 +30,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!session || (session.user as { role?: string }).role !== "admin") {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  if (!token || token.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized", errorCode: "AUTH_001" }, { status: 401 });
   }
 
@@ -99,8 +98,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!session || (session.user as { role?: string }).role !== "admin") {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  if (!token || token.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized", errorCode: "AUTH_001" }, { status: 401 });
   }
 

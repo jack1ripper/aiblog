@@ -19,14 +19,15 @@ export function Toc({ items }: TocProps) {
 
   useEffect(() => {
     if (items && items.length > 0) return;
-
-    const elements = Array.from(document.querySelectorAll("article h2, article h3"));
-    const parsed = elements.map((el) => ({
-      id: el.id,
-      text: el.textContent || "",
-      level: el.tagName === "H2" ? 2 : 3,
-    }));
-    setHeadings(parsed);
+    queueMicrotask(() => {
+      const elements = Array.from(document.querySelectorAll("article h2, article h3"));
+      const parsed = elements.map((el) => ({
+        id: el.id,
+        text: el.textContent || "",
+        level: el.tagName === "H2" ? 2 : 3,
+      }));
+      setHeadings(parsed);
+    });
   }, [items]);
 
   useEffect(() => {

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
+import path from "path";
+import { unlink } from "fs/promises";
 
 export async function GET(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
@@ -39,6 +41,11 @@ export async function PUT(req: NextRequest) {
   const body = await req.json();
   const { name, image, bio } = body;
 
+  const existingUser = await prisma.user.findUnique({
+    where: { email: userEmail },
+    select: { image: true },
+  });
+
   const updated = await prisma.user.update({
     where: { email: userEmail },
     data: {
@@ -48,6 +55,15 @@ export async function PUT(req: NextRequest) {
     },
     select: { id: true, name: true, email: true, image: true, bio: true },
   });
+
+  if (image && existingUser?.image && existingUser.image !== image && existingUser.image.startsWith("/uploads/")) {
+    try {
+      const oldPath = path.join(process.cwd(), "public", existingUser.image);
+      await unlink(oldPath);
+    } catch {
+      // ignore cleanup errors
+    }
+  }
 
   return NextResponse.json(updated);
 }

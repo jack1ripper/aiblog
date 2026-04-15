@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,7 @@ interface UserProfile {
 }
 
 export default function AdminProfilePage() {
+  const { update } = useSession();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -30,7 +32,6 @@ export default function AdminProfilePage() {
       .then(async (res) => {
         if (!res.ok) {
           const text = await res.text().catch(() => "Unknown error");
-          // eslint-disable-next-line no-console
           console.error("Profile load failed:", res.status, text);
           throw new Error(`加载失败 (${res.status})`);
         }
@@ -41,7 +42,6 @@ export default function AdminProfilePage() {
         setLoading(false);
       })
       .catch((err: unknown) => {
-        // eslint-disable-next-line no-console
         console.error("Failed to load user profile:", err);
         setLoading(false);
       });
@@ -78,6 +78,7 @@ export default function AdminProfilePage() {
       }
 
       setUser((prev) => (prev ? { ...prev, image: uploadData.url } : prev));
+      await update({ image: uploadData.url });
       setMessage("头像更新成功");
     } catch (err: unknown) {
       setMessage(err instanceof Error ? err.message : "头像上传失败");
@@ -107,6 +108,7 @@ export default function AdminProfilePage() {
         throw new Error(data.error || "保存失败");
       }
       setUser(data);
+      await update({ name: user.name, image: user.image });
       setMessage("保存成功");
     } catch (err: unknown) {
       setMessage(err instanceof Error ? err.message : "保存失败");
