@@ -18,6 +18,7 @@
 | 错误处理 / 日志 / 监控 | `12-error-observability.md` | — |
 | 新功能开发（通用） | `02-requirements.md`、`03-tech-stack.md`、`04-architecture.md`、`tasks/current.md` | `05-user-flow.md` |
 | 提交代码 / 分支管理 | `13-git-workflow.md` | — |
+| AI 协作规范 / 子代理流程 | `14-agent-guidelines.md` | — |
 
 ## 第三步：确认任务
 
