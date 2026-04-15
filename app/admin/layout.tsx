@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
-import { FileText, PlusCircle, LayoutDashboard, LogOut, User, Megaphone, Mail } from "lucide-react";
+import { FileText, PlusCircle, LayoutDashboard, LogOut, User, Megaphone, Mail, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default async function AdminLayout({
@@ -22,6 +22,13 @@ export default async function AdminLayout({
           管理后台
         </div>
         <nav className="flex gap-2 p-4 md:flex-col">
+          <Link
+            href="/admin/dashboard"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+          >
+            <BarChart3 className="h-4 w-4" />
+            数据看板
+          </Link>
           <Link
             href="/admin/posts"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"

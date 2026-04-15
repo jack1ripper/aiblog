@@ -116,3 +116,11 @@ model Subscriber {
   subscribedAt DateTime @default(now())
   isActive     Boolean  @default(true)
 }
+
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  viewedAt  DateTime @default(now())
+  referrer  String?
+  ua        String?
+}

@@ -2,6 +2,7 @@ import { Header } from "@/components/header";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteBanners } from "@/components/site-banners";
 import { getActiveBanners } from "@/lib/announcements";
+import { PageViewTracker } from "@/components/pageview-tracker";
 
 export default async function BlogLayout({
   children,
@@ -12,6 +13,7 @@ export default async function BlogLayout({
 
   return (
     <>
+      <PageViewTracker />
       <Header />
       <SiteBanners banners={banners} />
       <main className="flex-1">{children}</main>
