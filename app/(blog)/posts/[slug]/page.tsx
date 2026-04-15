@@ -21,14 +21,25 @@ export async function generateMetadata({ params }: PostPageProps) {
   const { slug } = await params;
   const post = await prisma.post.findUnique({
     where: { slug, published: true },
-    select: { title: true, excerpt: true },
+    select: { title: true, excerpt: true, author: { select: { name: true } } },
   });
 
   if (!post) return { title: "页面不存在" };
 
+  const ogUrl = `/api/og?title=${encodeURIComponent(post.title)}&author=${encodeURIComponent(post.author?.name || "")}`;
+
   return {
     title: post.title,
     description: post.excerpt || undefined,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt || undefined,
+      images: [ogUrl],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: [ogUrl],
+    },
   };
 }
 
