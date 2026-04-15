@@ -48,7 +48,7 @@
 
 - 优先使用已有依赖，新增依赖必须说明理由并验证真实存在
 - 禁止硬编码密钥、拼接 SQL、执行用户输入的字符串
-- 每个 task 完成后：启动 dev 服务器供验证 → 更新 `tasks/current.md` → `git commit` → **`git push`**
+- 每个 task 完成后：运行测试 → 更新 `tasks/current.md` → `git commit` → **`git push`**
 - 涉及架构变更必须写入 `decisions/YYYY-MM-DD-<标题>.md`
 
 ## Next.js / React 前端开发红线（强制）
@@ -70,18 +70,12 @@
 
 ## 自动测试与推送纪律（强制执行）
 
-> 每完成一个 task，**自动启动开发服务器**（`npm run dev`），并执行以下验证步骤：
+> 每完成一个 task，**自动运行构建**（`npm run build`），然后以**严格 QA 视角**自查前后端 bug：
+> - **前端**：样式生效、响应式、交互状态、空/错状态、hydration 错误
+> - **后端**：权限完整、数据不泄漏、参数边界、异常状态码正确
 >
-> 1. 使用 `curl` 检查关键页面/API 是否正常（HTTP 200、无服务端报错）。
-> 2. **使用 Chrome DevTools MCP 打开浏览器**，访问相关页面，检查：
->    - 页面渲染是否正常（无空白、无布局错位）。
->    - 样式是否与预期一致（light/dark 双主题）。
->    - 关键交互是否可用（按钮、表单提交、弹窗、导航等）。
->    - 浏览器控制台是否有报错（error / warning）。
-> 3. 若涉及表单或后台功能，**必须手动输入测试数据**并提交，确认数据流转正确。
->
-> 验证通过后，更新 `tasks/current.md` → `git commit` → **`git push`**。
-> 发现 bug 立即修复，push 失败须明确报告原因，禁止假装已完成。
+> 发现 bug **立即修复**，构建和自测全部通过后再 `git commit` 并 **`git push`**。
+> 如果 push 失败，明确报告原因，禁止假装已完成。
 
 ## 质量门禁（必须暂停并请示）
 
@@ -89,55 +83,3 @@
 - 引入新的外部依赖
 - 测试覆盖率下降
 - 需求与实现冲突
-
----
-
-## 子代理使用规范（Sub-Agent）
-
-### 何时必须创建子代理
-
-| 场景 | 动作 |
-|------|------|
-| 任务涉及 ≥3 个文件且跨领域（前端+后端） | 必须先创建 Plan agent 做预规划 |
-| 需要同时搜索多个不相关代码区域 | 并行创建 2-3 个 Explore agent |
-| 涉及 Go / Python / Kotlin 代码修改 | 修改后必须调用对应的 language reviewer agent |
-| 涉及用户输入、API 边界、敏感数据 | 修改后必须调用 security-reviewer agent |
-| 有前端页面改动 | 修改后必须调用 e2e-runner agent 做浏览器验证 |
-| 架构级重构或重大设计决策 | 必须调用 architect agent |
-
-### 分层代理模型（Orchestrator Pattern）
-
-- **父代理（当前会话）**：只负责任务路由、读取文档、调用子代理、整合结果、更新 `tasks/current.md`、触发 `ScheduleWakeup`。
-- **子代理**：只负责被委托的单一职责（研究、规划、编码、审查、测试）。
-- **禁止子代理再创建子代理**：避免嵌套过深导致不可控。
-
-### 并行与串行执行规范
-
-- **可并行**：独立的代码搜索、互不依赖的文件修改前的多领域 review、独立的测试任务。
-- **必须串行**：有依赖关系的代码修改（A 文件被 B 文件 import）、先 review 后 commit 的流程。
-- **默认策略**：先并行做研究与规划，再串行执行与验证。
-
-### 常用子代理类型速查表
-
-| 子代理类型 | 用途 |
-|-----------|------|
-| `Explore` | 快速搜索代码库、定位文件 |
-| `Plan` | 复杂任务的预规划设计 |
-| `everything-claude-code:code-reviewer` | 通用代码质量审查 |
-| `everything-claude-code:go-reviewer` | Go 代码审查 |
-| `everything-claude-code:python-reviewer` | Python 代码审查 |
-| `everything-claude-code:security-reviewer` | 安全漏洞扫描 |
-| `everything-claude-code:e2e-runner` | 浏览器自动化测试 |
-| `everything-claude-code:architect` | 架构决策评估 |
-
-### 委托与验证纪律
-
-1. **不信任子代理的口头总结**：子代理报告完成后，父代理必须检查实际文件修改（`Read` 关键文件或 `git diff`）。
-2. **子代理失败时停止推进**：如果子代理返回错误、测试未通过、review 未通过，禁止继续下一步，必须将 blocker 写入 `tasks/current.md`。
-3. **子代理的上下文隔离**：使用 `isolation: "worktree"` 进行高风险实验性修改，完成后由父代理决定是否合并结果。
-
-### 上下文清理与熔断纪律
-
-- **每完成 1-3 个 tasks 后**，父代理必须主动更新 `tasks/current.md`，并可调用 `ScheduleWakeup(delaySeconds=60~300)` 进入下一轮，以控制单一会话上下文长度。
-- **总 token 接近上限征兆**（响应明显变慢、出现无关联想）时，立即停止当前工作，保存进度到 `tasks/current.md`，并建议用户开启新会话继续。
-- **浏览器测试失败连续 2 次**：停止自动化循环，记录 blocker，等待人工介入。
