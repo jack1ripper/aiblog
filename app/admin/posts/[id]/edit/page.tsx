@@ -17,13 +17,17 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
     notFound();
   }
 
-  const categories = await prisma.category.findMany({ orderBy: { name: "asc" } });
+  const [categories, series] = await Promise.all([
+    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    prisma.series.findMany({ orderBy: { name: "asc" } }),
+  ]);
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">编辑文章</h1>
       <PostForm
         categories={categories}
+        series={series}
         initialData={{
           id: post.id,
           title: post.title,
@@ -35,6 +39,8 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
           pinned: post.pinned,
           categoryId: post.categoryId || undefined,
           tagNames: post.tags.map((t) => t.name),
+          seriesId: post.seriesId || undefined,
+          seriesOrder: post.seriesOrder,
         }}
       />
     </div>

@@ -14,6 +14,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     include: {
       category: true,
       tags: true,
+      series: true,
       author: { select: { name: true, email: true } },
     },
   });
@@ -37,7 +38,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const { id } = await params;
   const body = await req.json();
-  const { title, slug: rawSlug, content, excerpt, coverImage, published, pinned, categoryId, tagNames } = body;
+  const { title, slug: rawSlug, content, excerpt, coverImage, published, pinned, seriesId, seriesOrder, categoryId, tagNames } = body;
 
   const existingPost = await prisma.post.findUnique({ where: { id } });
   if (!existingPost) {
@@ -89,6 +90,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       coverImage,
       published,
       pinned: pinned ?? existingPost.pinned,
+      seriesId: seriesId || null,
+      seriesOrder: seriesOrder ?? existingPost.seriesOrder,
       categoryId: categoryId || null,
       tags: connectTags,
     },

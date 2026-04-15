@@ -12,6 +12,7 @@ import { zhCN } from "date-fns/locale";
 import { Eye, Rss, ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { ReadingProgress } from "@/components/reading-progress";
+import { SeriesNav } from "@/components/series-nav";
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -52,6 +53,15 @@ export default async function PostPage({ params }: PostPageProps) {
       category: true,
       tags: true,
       author: { select: { name: true, image: true, bio: true, email: true } },
+      series: {
+        include: {
+          posts: {
+            where: { published: true },
+            select: { id: true, title: true, slug: true, seriesOrder: true },
+            orderBy: { seriesOrder: "asc" },
+          },
+        },
+      },
     },
   });
 
@@ -119,6 +129,12 @@ export default async function PostPage({ params }: PostPageProps) {
               </Link>
             </div>
           </header>
+
+          {post.series && (
+            <div className="mb-6">
+              <SeriesNav series={post.series} currentPostId={post.id} />
+            </div>
+          )}
 
           {post.coverImage && (
             <div className="mb-8 overflow-hidden rounded-xl">

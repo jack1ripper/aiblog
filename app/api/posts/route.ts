@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { title, slug: rawSlug, content, excerpt, coverImage, published, pinned, categoryId, tagNames } = body;
+  const { title, slug: rawSlug, content, excerpt, coverImage, published, pinned, seriesId, seriesOrder, categoryId, tagNames } = body;
 
   if (!title || !content) {
     return NextResponse.json({ error: "Missing required fields", errorCode: "POST_400" }, { status: 400 });
@@ -78,6 +78,8 @@ export async function POST(req: NextRequest) {
       coverImage,
       published: published ?? false,
       pinned: pinned ?? false,
+      seriesId: seriesId || null,
+      seriesOrder: seriesOrder ?? 0,
       authorId: token.sub as string,
       categoryId: categoryId || null,
       tags: connectTags,

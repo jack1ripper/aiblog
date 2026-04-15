@@ -23,11 +23,14 @@ interface PostFormProps {
     pinned?: boolean;
     categoryId?: string;
     tagNames: string[];
+    seriesId?: string;
+    seriesOrder?: number;
   };
   categories: { id: string; name: string }[];
+  series: { id: string; name: string }[];
 }
 
-export function PostForm({ initialData, categories }: PostFormProps) {
+export function PostForm({ initialData, categories, series }: PostFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(initialData?.title || "");
   const [slug, setSlug] = useState(initialData?.slug || "");
@@ -38,6 +41,8 @@ export function PostForm({ initialData, categories }: PostFormProps) {
   const [categoryId, setCategoryId] = useState(initialData?.categoryId || "");
   const [tags, setTags] = useState(initialData?.tagNames.join(", ") || "");
   const [pinned, setPinned] = useState(initialData?.pinned ?? false);
+  const [seriesId, setSeriesId] = useState(initialData?.seriesId || "");
+  const [seriesOrder, setSeriesOrder] = useState(initialData?.seriesOrder ?? 0);
   const [loadingTarget, setLoadingTarget] = useState<"draft" | "publish" | null>(null);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -77,6 +82,8 @@ export function PostForm({ initialData, categories }: PostFormProps) {
       coverImage,
       published: willPublish,
       pinned,
+      seriesId: seriesId || undefined,
+      seriesOrder: Number(seriesOrder) || 0,
       categoryId: categoryId || undefined,
       tagNames: tags.split(",").map((t) => t.trim()).filter(Boolean),
     };
@@ -213,6 +220,37 @@ export function PostForm({ initialData, categories }: PostFormProps) {
             value={tags}
             onChange={(e) => setTags(e.target.value)}
             placeholder="技术, 生活, 教程"
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="series">所属系列</Label>
+          <select
+            id="series"
+            value={seriesId}
+            onChange={(e) => setSeriesId(e.target.value)}
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          >
+            <option value="">无</option>
+            {series.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="seriesOrder">系列内顺序</Label>
+          <Input
+            id="seriesOrder"
+            type="number"
+            min={0}
+            value={seriesOrder}
+            onChange={(e) => setSeriesOrder(Number(e.target.value))}
+            placeholder="0"
           />
         </div>
       </div>
