@@ -1,8 +1,51 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { PostCard } from "@/components/post-card";
 
 interface SearchPageProps {
   searchParams: Promise<{ q?: string }>;
+}
+
+function escapeRegExp(str: string) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function Highlight({ text, keyword }: { text: string; keyword: string }) {
+  if (!keyword.trim()) return <>{text}</>;
+  const parts = text.split(new RegExp(`(${escapeRegExp(keyword)})`, "gi"));
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === keyword.toLowerCase() ? (
+          <strong key={i} className="text-foreground">
+            {part}
+          </strong>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
+}
+
+function getExcerpt(post: { excerpt: string | null; content: string }, keyword: string, maxLength = 160) {
+  const raw = post.excerpt || post.content || "";
+  if (!keyword.trim()) return raw.slice(0, maxLength);
+  const index = raw.toLowerCase().indexOf(keyword.toLowerCase());
+  if (index === -1) return raw.slice(0, maxLength);
+  const start = Math.max(0, index - 50);
+  const end = Math.min(raw.length, index + maxLength);
+  let snippet = raw.slice(start, end);
+  if (start > 0) snippet = "…" + snippet;
+  if (end < raw.length) snippet = snippet + "…";
+  return snippet;
+}
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString("zh-CN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
@@ -17,6 +60,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             { title: { contains: query } },
             { content: { contains: query } },
             { excerpt: { contains: query } },
+            { tags: { some: { name: { contains: query } } } },
           ],
         },
         orderBy: { createdAt: "desc" },
@@ -45,14 +89,32 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       {query ? (
         posts.length === 0 ? (
           <div className="text-center text-muted-foreground">
-            未找到与 &quot;{query}&quot; 相关的文章
+            未找到相关文章
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="space-y-4">
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <li
+                key={post.id}
+                className="rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-sm"
+              >
+                <Link href={`/posts/${post.slug}`} className="block focus:outline-none">
+                  <div className="text-base font-semibold text-foreground">
+                    <Highlight text={post.title} keyword={query} />
+                  </div>
+                  <div className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                    <Highlight
+                      text={getExcerpt(post, query)}
+                      keyword={query}
+                    />
+                  </div>
+                  <div className="mt-2 text-xs text-muted-foreground/70">
+                    {formatDate(post.createdAt)}
+                  </div>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         )
       ) : (
         <div className="text-center text-muted-foreground">

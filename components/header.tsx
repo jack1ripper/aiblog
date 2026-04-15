@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { Moon, Sun, Menu, User, LayoutDashboard, LogOut } from "lucide-react";
+import { Moon, Sun, Menu, User, LayoutDashboard, LogOut, Search } from "lucide-react";
+import { SearchDialog } from "@/components/search-dialog";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -29,11 +30,10 @@ export function Header() {
   const { theme, setTheme } = useTheme();
   const { data: session } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // hydration guard: avoid mismatch between SSR and CSR
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -43,25 +43,35 @@ export function Header() {
     : null;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
-        <Link href="/" className="text-xl font-bold tracking-tight">
+        <Link href="/" className="text-lg font-bold tracking-tight">
           我的博客
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <nav className="hidden items-center gap-1 md:flex">
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`relative rounded-md px-3 py-1.5 text-sm font-medium transition-colors duration-150 ${
+                  isActive
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {link.label}
+                {isActive && (
+                  <span className="absolute inset-x-2 -bottom-[15px] h-0.5 rounded-full bg-foreground" />
+                )}
+              </Link>
+            );
+          })}
           <Link
             href="/admin/posts"
-            className="text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground"
+            className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground"
           >
             后台
           </Link>
@@ -69,14 +79,18 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           {mounted && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              aria-label="切换主题"
-            >
-              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </Button>
+            <>
+              <SearchDialog />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-full"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                aria-label="切换主题"
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+            </>
           )}
 
           {mounted && isAdmin && adminAvatarUrl && (
@@ -123,24 +137,31 @@ export function Header() {
           <Sheet>
             <SheetTrigger
               className="md:hidden"
-              render={<Button variant="ghost" size="icon" aria-label="打开菜单" />}
+              render={<Button variant="ghost" size="icon" className="h-9 w-9" aria-label="打开菜单" />}
             >
               <Menu className="h-5 w-5" />
             </SheetTrigger>
             <SheetContent side="right">
-              <nav className="mt-8 flex flex-col gap-4">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+              <nav className="mt-8 flex flex-col gap-2">
+                {navLinks.map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`rounded-md px-3 py-2 text-base font-medium transition-colors ${
+                        isActive
+                          ? "bg-muted text-foreground"
+                          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
                 <Link
                   href="/admin/posts"
-                  className="text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
+                  className="rounded-md px-3 py-2 text-base font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
                 >
                   后台
                 </Link>
@@ -148,13 +169,13 @@ export function Header() {
                   <>
                     <Link
                       href="/admin/profile"
-                      className="text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
+                      className="rounded-md px-3 py-2 text-base font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
                     >
                       个人设置
                     </Link>
                     <button
                       onClick={() => signOut({ callbackUrl: "/" })}
-                      className="text-left text-base font-medium text-destructive transition-colors hover:text-destructive/80"
+                      className="rounded-md px-3 py-2 text-left text-base font-medium text-destructive transition-colors hover:bg-destructive/10"
                     >
                       退出登录
                     </button>
