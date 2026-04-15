@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { Rss, Mail } from "lucide-react";
 import { NewsletterForm } from "@/components/newsletter-form";
 
@@ -9,13 +10,6 @@ const footerLinks = [
   { href: "/archive", label: "归档" },
   { href: "/friends", label: "友链" },
   { href: "/about", label: "关于" },
-];
-
-const socialLinks = [
-  { href: "https://github.com", label: "GitHub", Icon: GithubSvg },
-  { href: "https://twitter.com", label: "Twitter", Icon: TwitterSvg },
-  { href: "mailto:hello@example.com", label: "Email", Icon: Mail },
-  { href: "/feed.xml", label: "RSS", Icon: Rss },
 ];
 
 function GithubSvg({ className }: { className?: string }) {
@@ -44,7 +38,26 @@ function TwitterSvg({ className }: { className?: string }) {
   );
 }
 
+function getRssUrl() {
+  if (typeof window === "undefined") return "/feed.xml";
+  return `${window.location.origin}/feed.xml`;
+}
+
 export function SiteFooter() {
+  const [showCopied, setShowCopied] = useState(false);
+
+  async function handleCopyRss(e: React.MouseEvent) {
+    e.preventDefault();
+    const url = getRssUrl();
+    try {
+      await navigator.clipboard.writeText(url);
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
+    } catch {
+      window.open(url, "_blank");
+    }
+  }
+
   return (
     <footer className="border-t border-border/50 bg-muted/30">
       <div className="container mx-auto px-4 py-14">
@@ -87,19 +100,44 @@ export function SiteFooter() {
                   关注
                 </p>
                 <div className="flex gap-3">
-                  {socialLinks.map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-muted-foreground transition-colors hover:text-foreground"
-                      aria-label={link.label}
-                    >
-                      <link.Icon className="h-4 w-4" />
-                    </a>
-                  ))}
+                  <a
+                    href="https://github.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label="GitHub"
+                  >
+                    <GithubSvg className="h-4 w-4" />
+                  </a>
+                  <a
+                    href="https://twitter.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label="Twitter"
+                  >
+                    <TwitterSvg className="h-4 w-4" />
+                  </a>
+                  <a
+                    href="mailto:hello@example.com"
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label="Email"
+                  >
+                    <Mail className="h-4 w-4" />
+                  </a>
+                  <button
+                    onClick={handleCopyRss}
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label="RSS"
+                  >
+                    <Rss className="h-4 w-4" />
+                  </button>
                 </div>
+                {showCopied && (
+                  <p className="text-xs text-foreground">
+                    已复制 RSS 地址，可粘贴到阅读器订阅
+                  </p>
+                )}
               </div>
             </div>
           </div>

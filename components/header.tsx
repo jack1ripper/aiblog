@@ -18,15 +18,33 @@ const navLinks = [
 
 const isDev = process.env.NODE_ENV === "development";
 
+function getRssUrl() {
+  if (typeof window === "undefined") return "/feed.xml";
+  return `${window.location.origin}/feed.xml`;
+}
+
 export function Header() {
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const [showCopied, setShowCopied] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 0);
     return () => clearTimeout(t);
   }, []);
+
+  async function handleCopyRss(e: React.MouseEvent) {
+    e.preventDefault();
+    const url = getRssUrl();
+    try {
+      await navigator.clipboard.writeText(url);
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
+    } catch {
+      window.open(url, "_blank");
+    }
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
@@ -75,13 +93,20 @@ export function Header() {
           {mounted && (
             <>
               <SearchDialog />
-              <Link
-                href="/feed.xml"
-                className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-background px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <Rss className="h-3 w-3" />
-                RSS
-              </Link>
+              <div className="relative">
+                <button
+                  onClick={handleCopyRss}
+                  className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-background px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <Rss className="h-3 w-3" />
+                  RSS
+                </button>
+                {showCopied && (
+                  <span className="absolute right-0 top-9 z-50 w-max max-w-[220px] rounded-md bg-foreground px-2 py-1 text-xs text-background shadow-lg">
+                    已复制 RSS 地址，可粘贴到阅读器订阅
+                  </span>
+                )}
+              </div>
               <Button
                 variant="ghost"
                 size="icon"
