@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,24 +18,30 @@ interface ClosedEntry {
 const STORAGE_KEY = "closedBannerIds";
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 
+const getTimestamp = () => Date.now();
+
 export function SiteBanners({ banners }: { banners: Banner[] }) {
   const [mounted, setMounted] = useState(false);
-  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    setMounted(true);
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
     try {
-      const raw = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : null;
+      const raw = window.localStorage.getItem(STORAGE_KEY);
       const parsed: ClosedEntry[] = raw ? JSON.parse(raw) : [];
       const now = Date.now();
       const valid = parsed.filter((entry) => now - entry.closedAt < TWENTY_FOUR_HOURS);
-      setHiddenIds(new Set(valid.map((entry) => entry.id)));
       if (valid.length !== parsed.length) {
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(valid));
       }
+      return new Set(valid.map((entry) => entry.id));
     } catch {
-      // ignore localStorage errors
+      return new Set();
     }
+  });
+  const timestampRef = useRef(getTimestamp);
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   const handleClose = (id: string) => {
@@ -43,9 +49,8 @@ export function SiteBanners({ banners }: { banners: Banner[] }) {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       const parsed: ClosedEntry[] = raw ? JSON.parse(raw) : [];
-      const filtered = parsed.filter((entry) => entry.id !== id);
-      filtered.push({ id, closedAt: Date.now() });
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+      const updated = [...parsed.filter((entry) => entry.id !== id), { id, closedAt: timestampRef.current() }];
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     } catch {
       // ignore
     }

@@ -131,7 +131,7 @@ function Code({ className, children, ...props }: React.ComponentPropsWithoutRef<
 }
 
 function Div({ children, ...props }: React.ComponentPropsWithoutRef<"div">) {
-  const callout = (props as any)["data-callout"] as string | undefined;
+  const callout = (props as Record<string, unknown>)["data-callout"] as string | undefined;
   if (callout === "note" || callout === "tip" || callout === "warning") {
     const Icon = callout === "note" ? Info : callout === "tip" ? Lightbulb : AlertTriangle;
     const styles =

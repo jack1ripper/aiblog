@@ -17,9 +17,9 @@ export async function GET(req: NextRequest) {
     prisma.post.count(),
     prisma.post.aggregate({ _sum: { views: true } }),
     prisma.$queryRaw`
-      SELECT strftime('%Y-%m-%d', viewedAt) as date, COUNT(id) as count
+      SELECT strftime('%Y-%m-%d', viewedAt / 1000, 'unixepoch') as date, COUNT(id) as count
       FROM PageView
-      WHERE viewedAt >= ${sevenDaysAgoStr}
+      WHERE datetime(viewedAt / 1000, 'unixepoch') >= ${sevenDaysAgoStr}
       GROUP BY date
       ORDER BY date ASC
     ` as Promise<{ date: string; count: number }[]>,
