@@ -83,3 +83,55 @@
 - 引入新的外部依赖
 - 测试覆盖率下降
 - 需求与实现冲突
+
+---
+
+## 子代理使用规范（Sub-Agent）
+
+### 何时必须创建子代理
+
+| 场景 | 动作 |
+|------|------|
+| 任务涉及 ≥3 个文件且跨领域（前端+后端） | 必须先创建 Plan agent 做预规划 |
+| 需要同时搜索多个不相关代码区域 | 并行创建 2-3 个 Explore agent |
+| 涉及 Go / Python / Kotlin 代码修改 | 修改后必须调用对应的 language reviewer agent |
+| 涉及用户输入、API 边界、敏感数据 | 修改后必须调用 security-reviewer agent |
+| 有前端页面改动 | 修改后必须调用 e2e-runner agent 做浏览器验证 |
+| 架构级重构或重大设计决策 | 必须调用 architect agent |
+
+### 分层代理模型（Orchestrator Pattern）
+
+- **父代理（当前会话）**：只负责任务路由、读取文档、调用子代理、整合结果、更新 `tasks/current.md`。
+- **子代理**：只负责被委托的单一职责（研究、规划、编码、审查、测试）。
+- **禁止子代理再创建子代理**：避免嵌套过深导致不可控。
+
+### 并行与串行执行规范
+
+- **可并行**：独立的代码搜索、互不依赖的文件修改前的多领域 review、独立的测试任务。
+- **必须串行**：有依赖关系的代码修改（A 文件被 B 文件 import）、先 review 后 commit 的流程。
+- **默认策略**：先并行做研究与规划，再串行执行与验证。
+
+### 常用子代理类型速查表
+
+| 子代理类型 | 用途 |
+|-----------|------|
+| `Explore` | 快速搜索代码库、定位文件 |
+| `Plan` | 复杂任务的预规划设计 |
+| `everything-claude-code:code-reviewer` | 通用代码质量审查 |
+| `everything-claude-code:go-reviewer` | Go 代码审查 |
+| `everything-claude-code:python-reviewer` | Python 代码审查 |
+| `everything-claude-code:security-reviewer` | 安全漏洞扫描 |
+| `everything-claude-code:e2e-runner` | 浏览器自动化测试 |
+| `everything-claude-code:architect` | 架构决策评估 |
+
+### 委托与验证纪律
+
+1. **不信任子代理的口头总结**：子代理报告完成后，父代理必须检查实际文件修改（`Read` 关键文件或 `git diff`）。
+2. **子代理失败时停止推进**：如果子代理返回错误、测试未通过、review 未通过，禁止继续下一步，必须将 blocker 写入 `tasks/current.md`。
+3. **子代理的上下文隔离**：使用 `isolation: "worktree"` 进行高风险实验性修改，完成后由父代理决定是否合并结果。
+
+### 上下文清理与熔断纪律
+
+- **每完成 1-3 个 tasks 后**，父代理必须主动更新 `tasks/current.md`，并**向用户建议开启新会话继续**，以控制单一会话上下文长度，避免记忆下降和幻觉。
+- **总 token 接近上限征兆**（响应明显变慢、出现无关联想）时，立即停止当前工作，保存进度到 `tasks/current.md`，并建议用户开启新会话继续。
+- **浏览器测试失败连续 2 次**：停止推进，记录 blocker，等待人工介入。
