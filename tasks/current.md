@@ -59,16 +59,16 @@
 
 ### TASK-202: 站点通知系统（Site Notifications）
 - **优先级**: 高
-- **状态**: ⬜ 待办
+- **状态**: ✅ 已完成
 - **描述**:
   - 提供两种通知形态：**全局顶部横幅（Banner）** 和 **文章内嵌提示块（Callout）**。
   - Banner 用于站点级公告（如「本站即将维护」），支持关闭（`localStorage` 记录已关闭的 ID，24h 内不再显示）。
   - 文章内嵌 Callout 用于文章级更新说明（如「2026-04-20 更新：修正了某处错误」），在 Markdown 中通过 `:::note` / `:::warning` 语法渲染（使用 remark 插件或自定义解析）。
 - **验收标准**:
-  - [ ] 新增 `Announcement` 模型（`id`, `content`, `type: banner|toast`, `link?`, `isActive`, `startAt`, `endAt`, `createdAt`）。
-  - [ ] 管理后台新增「公告管理」页面，可增删改查、设置有效期。
-  - [ ] 前端 Layout 自动拉取活跃 Banner，渲染在 Header 下方；用户点击关闭后写入 `localStorage`。
-  - [ ] `MarkdownRenderer` 支持 `:::note` / `:::warning` / `:::tip` 语法，渲染为带图标的提示块。
+  - [x] 新增 `Announcement` 模型（`id`, `content`, `type: banner|toast`, `link?`, `isActive`, `startAt`, `endAt`, `createdAt`）。
+  - [x] 管理后台新增「公告管理」页面，可增删改查、设置有效期。
+  - [x] 前端 Layout 自动拉取活跃 Banner，渲染在 Header 下方；用户点击关闭后写入 `localStorage`。
+  - [x] `MarkdownRenderer` 支持 `:::note` / `:::warning` / `:::tip` 语法，渲染为带图标的提示块。
 
 ### TASK-203: RSS 订阅增强
 - **优先级**: 高

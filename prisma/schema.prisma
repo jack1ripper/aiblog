@@ -84,3 +84,14 @@ model Category {
   name  String @unique
   posts Post[]
 }
+
+model Announcement {
+  id        String    @id @default(cuid())
+  content   String
+  type      String
+  link      String?
+  isActive  Boolean   @default(true)
+  startAt   DateTime?
+  endAt     DateTime?
+  createdAt DateTime  @default(now())
+}
