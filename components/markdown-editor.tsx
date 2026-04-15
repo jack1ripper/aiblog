@@ -15,6 +15,36 @@ interface MarkdownEditorProps {
 export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
   const cmRef = useRef<Editor | null>(null);
 
+  function uploadImageAndInsert(file: File, cm: Editor) {
+    const placeholderId = `uploading-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const placeholder = `![${placeholderId}]()`;
+
+    cm.replaceSelection(placeholder);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    fetch("/api/upload", { method: "POST", body: formData })
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "上传失败");
+        }
+        const currentValue = cm.getValue();
+        const newValue = currentValue.replace(placeholder, `![image](${data.url})`);
+        if (currentValue !== newValue) {
+          cm.setValue(newValue);
+        }
+      })
+      .catch(() => {
+        const currentValue = cm.getValue();
+        const newValue = currentValue.replace(placeholder, "<!-- 图片上传失败，请重试 -->");
+        if (currentValue !== newValue) {
+          cm.setValue(newValue);
+        }
+      });
+  }
+
   const handlePaste = useCallback((_instance: Editor, event: ClipboardEvent) => {
     const items = event.clipboardData?.items;
     if (!items) return;
@@ -36,35 +66,31 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
     imageItems.forEach((item) => {
       const blob = item.getAsFile();
       if (!blob) return;
-
-      const placeholderId = `uploading-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-      const placeholder = `![${placeholderId}]()`;
-
-      cm.replaceSelection(placeholder);
-
       const file = new File([blob], `pasted-image.png`, { type: blob.type });
-      const formData = new FormData();
-      formData.append("file", file);
+      uploadImageAndInsert(file, cm);
+    });
+  }, []);
 
-      fetch("/api/upload", { method: "POST", body: formData })
-        .then(async (res) => {
-          const data = await res.json();
-          if (!res.ok) {
-            throw new Error(data.error || "上传失败");
-          }
-          const currentValue = cm.getValue();
-          const newValue = currentValue.replace(placeholder, `![image](${data.url})`);
-          if (currentValue !== newValue) {
-            cm.setValue(newValue);
-          }
-        })
-        .catch(() => {
-          const currentValue = cm.getValue();
-          const newValue = currentValue.replace(placeholder, "<!-- 图片上传失败，请重试 -->");
-          if (currentValue !== newValue) {
-            cm.setValue(newValue);
-          }
-        });
+  const handleDrop = useCallback((_instance: Editor, event: DragEvent) => {
+    const files = event.dataTransfer?.files;
+    if (!files || files.length === 0) return;
+
+    const imageFiles: File[] = [];
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].type.startsWith("image/")) {
+        imageFiles.push(files[i]);
+      }
+    }
+
+    if (imageFiles.length === 0) return;
+
+    event.preventDefault();
+
+    const cm = cmRef.current;
+    if (!cm) return;
+
+    imageFiles.forEach((file) => {
+      uploadImageAndInsert(file, cm);
     });
   }, []);
 
@@ -80,7 +106,7 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
         getCodemirrorInstance={(instance: Editor) => {
           cmRef.current = instance;
         }}
-        events={{ paste: handlePaste }}
+        events={{ paste: handlePaste, drop: handleDrop }}
       />
     </div>
   );
