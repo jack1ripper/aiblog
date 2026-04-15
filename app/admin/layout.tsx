@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
-import { FileText, PlusCircle, LayoutDashboard, LogOut, User, Megaphone } from "lucide-react";
+import { FileText, PlusCircle, LayoutDashboard, LogOut, User, Megaphone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default async function AdminLayout({
@@ -42,6 +42,13 @@ export default async function AdminLayout({
           >
             <Megaphone className="h-4 w-4" />
             站点通知
+          </Link>
+          <Link
+            href="/admin/subscribers"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+          >
+            <Mail className="h-4 w-4" />
+            邮件订阅
           </Link>
           <Link
             href="/admin/profile"

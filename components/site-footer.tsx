@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Rss, Mail } from "lucide-react";
+import { NewsletterForm } from "@/components/newsletter-form";
 
 const footerLinks = [
   { href: "/", label: "首页" },
@@ -100,24 +101,29 @@ export function SiteFooter() {
             </div>
           </div>
 
-          <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/50 pt-6 sm:flex-row">
-            <p className="text-xs text-muted-foreground">
+          <div className="mt-10 border-t border-border/50 pt-8">
+            <div className="grid gap-8 sm:grid-cols-2">
+              <NewsletterForm />
+              <div className="flex flex-col items-start gap-4 sm:items-end sm:justify-end">
+                <div className="flex items-center gap-4">
+                  {socialLinks.slice(0, 3).map((link) => (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-muted-foreground transition-colors duration-150 hover:text-foreground"
+                      aria-label={link.label}
+                    >
+                      <link.Icon className="h-4 w-4" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <p className="mt-8 text-center text-xs text-muted-foreground sm:text-left">
               © {new Date().getFullYear()} 我的博客. All rights reserved.
             </p>
-            <div className="flex items-center gap-4">
-              {socialLinks.slice(0, 3).map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-muted-foreground transition-colors duration-150 hover:text-foreground"
-                  aria-label={link.label}
-                >
-                  <link.Icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
           </div>
         </div>
       </div>
