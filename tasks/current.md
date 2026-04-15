@@ -152,13 +152,13 @@
 
 ### TASK-210: 文章自动保存草稿
 - **优先级**: 低
-- **状态**: ⬜ 待办（原三期遗留）
+- **状态**: ✅ 已完成
 - **描述**:
   - 后台编辑文章时，每 30 秒自动将当前内容保存到 `localStorage`；页面刷新或意外关闭后可恢复。
 - **验收标准**:
-  - [ ] 编辑页 `useEffect` 定时将表单数据序列化到 `localStorage`（key: `draft-post-<postId|new>`）。
-  - [ ] 进入编辑页时检测 localStorage，若有较新的草稿，提示「恢复自动保存的草稿？」
-  - [ ] 用户手动保存或发布后，清除对应 localStorage 草稿。
+  - [x] 编辑页 `useEffect` 定时将表单数据序列化到 `localStorage`（key: `draft-post-<postId|new>`）。
+  - [x] 进入编辑页时检测 localStorage，若有较新的草稿，提示「恢复自动保存的草稿？」
+  - [x] 用户手动保存或发布后，清除对应 localStorage 草稿。
 
 ---
 
