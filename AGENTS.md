@@ -48,7 +48,7 @@
 
 - 优先使用已有依赖，新增依赖必须说明理由并验证真实存在
 - 禁止硬编码密钥、拼接 SQL、执行用户输入的字符串
-- 每个 task 完成后：运行测试 → 更新 `tasks/current.md` → `git commit` → **`git push`**
+- 每个 task 完成后：运行测试 → 更新 `tasks/current.md` → `git commit`（**备注统一使用中文**） → **`git push`**
 - 涉及架构变更必须写入 `decisions/YYYY-MM-DD-<标题>.md`
 
 ## Next.js / React 前端开发红线（强制）
