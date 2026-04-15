@@ -1,6 +1,6 @@
 # AI 开发规范
 
-1. 读取 `tasks/current.md`，确认本次要处理的任务编号和内容。
+1. 若要处理开发任务，读取 `tasks/current.md` 确认任务编号和内容。
 2. 若涉及 UI 改动，参考 `project-docs/08-design-system.md`。
 3. 需求明确直接执行；若需求模糊，先简要汇报再动手。
 4. git commit 备注统一使用中文。
