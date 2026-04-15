@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,9 +25,29 @@ interface PostFormProps {
     tagNames: string[];
     seriesId?: string;
     seriesOrder?: number;
+    updatedAt?: string;
   };
   categories: { id: string; name: string }[];
   series: { id: string; name: string }[];
+}
+
+interface DraftData {
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  coverImage: string;
+  published: boolean;
+  pinned: boolean;
+  categoryId: string;
+  tags: string;
+  seriesId: string;
+  seriesOrder: number;
+  savedAt: number;
+}
+
+function getDraftKey(postId?: string) {
+  return `draft-post-${postId || "new"}`;
 }
 
 export function PostForm({ initialData, categories, series }: PostFormProps) {
@@ -45,7 +65,74 @@ export function PostForm({ initialData, categories, series }: PostFormProps) {
   const [seriesOrder, setSeriesOrder] = useState(initialData?.seriesOrder ?? 0);
   const [loadingTarget, setLoadingTarget] = useState<"draft" | "publish" | null>(null);
   const [error, setError] = useState("");
+  const [draftNotice, setDraftNotice] = useState<{ hasDraft: boolean; savedAt: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const draftKey = getDraftKey(initialData?.id);
+
+  // Check localStorage for existing draft on mount
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = localStorage.getItem(draftKey);
+    if (!raw) return;
+    try {
+      const draft: DraftData = JSON.parse(raw);
+      const postUpdatedAt = initialData?.updatedAt ? new Date(initialData.updatedAt).getTime() : 0;
+      if (draft.savedAt > postUpdatedAt) {
+        setDraftNotice({ hasDraft: true, savedAt: draft.savedAt });
+      }
+    } catch {
+      localStorage.removeItem(draftKey);
+    }
+  }, [draftKey, initialData?.updatedAt]);
+
+  // Auto-save to localStorage every 30 seconds
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const interval = setInterval(() => {
+      const draft: DraftData = {
+        title,
+        slug,
+        content,
+        excerpt,
+        coverImage,
+        published,
+        pinned,
+        categoryId,
+        tags,
+        seriesId,
+        seriesOrder,
+        savedAt: Date.now(),
+      };
+      localStorage.setItem(draftKey, JSON.stringify(draft));
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [title, slug, content, excerpt, coverImage, published, pinned, categoryId, tags, seriesId, seriesOrder, draftKey]);
+
+  function restoreDraft() {
+    if (typeof window === "undefined") return;
+    const raw = localStorage.getItem(draftKey);
+    if (!raw) return;
+    try {
+      const draft: DraftData = JSON.parse(raw);
+      setTitle(draft.title);
+      setSlug(draft.slug);
+      setContent(draft.content);
+      setExcerpt(draft.excerpt);
+      setCoverImage(draft.coverImage);
+      setCategoryId(draft.categoryId);
+      setTags(draft.tags);
+      setPinned(draft.pinned);
+      setSeriesId(draft.seriesId);
+      setSeriesOrder(draft.seriesOrder);
+      setDraftNotice(null);
+    } catch {
+      localStorage.removeItem(draftKey);
+    }
+  }
+
+  function dismissDraftNotice() {
+    setDraftNotice(null);
+  }
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -99,6 +186,9 @@ export function PostForm({ initialData, categories, series }: PostFormProps) {
       });
 
       if (res.ok) {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem(draftKey);
+        }
         router.push("/admin/posts");
         router.refresh();
       } else {
@@ -120,6 +210,28 @@ export function PostForm({ initialData, categories, series }: PostFormProps) {
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {draftNotice?.hasDraft && (
+        <Alert variant="default">
+          <AlertDescription>
+            <span className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <span>
+                检测到自动保存的草稿（
+                {new Date(draftNotice.savedAt).toLocaleString("zh-CN")}
+                ），是否恢复？
+              </span>
+              <span className="flex gap-2">
+                <Button type="button" size="sm" onClick={restoreDraft}>
+                  恢复草稿
+                </Button>
+                <Button type="button" size="sm" variant="outline" onClick={dismissDraftNotice}>
+                  忽略
+                </Button>
+              </span>
+            </span>
+          </AlertDescription>
         </Alert>
       )}
 
