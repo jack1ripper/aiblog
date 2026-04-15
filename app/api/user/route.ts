@@ -9,9 +9,13 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized", errorCode: "AUTH_001" }, { status: 401 });
   }
 
-  const userId = (session.user as { id: string }).id;
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json({ error: "Email not found in session", errorCode: "AUTH_002" }, { status: 401 });
+  }
+
   const user = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { email: userEmail },
     select: { id: true, name: true, email: true, image: true, bio: true },
   });
 
@@ -28,12 +32,16 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized", errorCode: "AUTH_001" }, { status: 401 });
   }
 
-  const userId = (session.user as { id: string }).id;
+  const userEmail = session.user?.email;
+  if (!userEmail) {
+    return NextResponse.json({ error: "Email not found in session", errorCode: "AUTH_002" }, { status: 401 });
+  }
+
   const body = await req.json();
   const { name, image, bio } = body;
 
   const updated = await prisma.user.update({
-    where: { id: userId },
+    where: { email: userEmail },
     data: {
       name: name ?? undefined,
       image: image ?? undefined,

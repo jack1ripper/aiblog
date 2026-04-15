@@ -35,7 +35,9 @@ export default function AdminProfilePage() {
         setUser(data);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((err: unknown) => {
+        // eslint-disable-next-line no-console
+        console.error("Failed to load user profile:", err);
         setLoading(false);
       });
   }, []);
@@ -122,7 +124,11 @@ export default function AdminProfilePage() {
   }
 
   if (!user) {
-    return <div className="text-destructive">加载用户信息失败</div>;
+    return (
+      <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-destructive">
+        加载用户信息失败，请尝试重新登录后刷新页面。如果问题持续存在，请检查浏览器控制台中的错误日志。
+      </div>
+    );
   }
 
   const avatarUrl = getAvatarUrl(user.email, user.image, 160);
