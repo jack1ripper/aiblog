@@ -47,26 +47,33 @@ function TwitterSvg({ className }: { className?: string }) {
 export function SiteFooter() {
   return (
     <footer className="border-t border-border/50 bg-muted/30">
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-14">
         <div className="mx-auto max-w-3xl">
-          <div className="grid gap-8 sm:grid-cols-2">
-            <div>
-              <Link href="/" className="text-lg font-bold tracking-tight">
+          {/* Top section */}
+          <div className="grid gap-10 sm:grid-cols-[1fr_auto]">
+            {/* Brand */}
+            <div className="space-y-3">
+              <Link href="/" className="inline-block text-lg font-semibold tracking-tight">
                 Dusk³
               </Link>
+              <p className="text-[13px] leading-relaxed text-muted-foreground">
+                Script & Style — 记录前端开发与生活随笔。
+              </p>
+              <p className="text-xs text-muted-foreground/60">dusk3.com</p>
             </div>
 
-            <div className="flex gap-8 sm:justify-end">
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground">
-                  导航
-                </h3>
-                <ul className="mt-3 space-y-2">
+            {/* Links + Social */}
+            <div className="flex gap-12 sm:gap-16">
+              <div className="space-y-3">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-foreground/80">
+                  页面
+                </p>
+                <ul className="space-y-2">
                   {footerLinks.map((link) => (
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground"
+                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                       >
                         {link.label}
                       </Link>
@@ -75,41 +82,18 @@ export function SiteFooter() {
                 </ul>
               </div>
 
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground">
+              <div className="space-y-3">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-foreground/80">
                   关注
-                </h3>
-                <ul className="mt-3 space-y-2">
+                </p>
+                <div className="flex gap-3">
                   {socialLinks.map((link) => (
-                    <li key={link.label}>
-                      <a
-                        href={link.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground"
-                      >
-                        <link.Icon className="h-3.5 w-3.5" />
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-10 border-t border-border/50 pt-8">
-            <div className="grid gap-8 sm:grid-cols-2">
-              <NewsletterForm />
-              <div className="flex flex-col items-start gap-4 sm:items-end sm:justify-end">
-                <div className="flex items-center gap-4">
-                  {socialLinks.slice(0, 3).map((link) => (
                     <a
                       key={link.label}
                       href={link.href}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-muted-foreground transition-colors duration-150 hover:text-foreground"
+                      className="text-muted-foreground transition-colors hover:text-foreground"
                       aria-label={link.label}
                     >
                       <link.Icon className="h-4 w-4" />
@@ -118,9 +102,17 @@ export function SiteFooter() {
                 </div>
               </div>
             </div>
-            <p className="mt-8 text-center text-xs text-muted-foreground sm:text-left">
-              © {new Date().getFullYear()} Dusk³. All rights reserved.
+          </div>
+
+          {/* Divider */}
+          <div className="mt-12 border-t border-border/50" />
+
+          {/* Bottom section */}
+          <div className="mt-8 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+            <p className="text-xs text-muted-foreground/60">
+              © {new Date().getFullYear()} Dusk³
             </p>
+            <NewsletterForm />
           </div>
         </div>
       </div>
