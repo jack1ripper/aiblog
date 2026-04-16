@@ -19,7 +19,7 @@ export function ReadingProgress() {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed left-0 top-14 z-[60] h-[2px] w-full bg-transparent"
+    <div className="pointer-events-none fixed left-0 top-[5.25rem] z-40 h-[2px] w-full bg-transparent sm:top-[5.5rem]"
       aria-hidden="true"
     >
       <div
