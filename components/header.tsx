@@ -75,7 +75,7 @@ export function Header() {
         isVisible ? "translate-y-0" : "-translate-y-[calc(100%+1rem)]"
       }`}
     >
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 rounded-[26px] border border-white/40 bg-white/55 px-4 py-3 shadow-[0_18px_48px_rgba(15,23,42,0.08)] backdrop-blur-[22px] dark:border-white/10 dark:bg-white/6 dark:shadow-[0_18px_48px_rgba(0,0,0,0.28)]">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 rounded-[22px] border border-white/45 bg-white/68 px-4 py-3 shadow-[0_10px_28px_rgba(15,23,42,0.08)] backdrop-blur-[14px] dark:border-white/10 dark:bg-white/8 dark:shadow-[0_10px_28px_rgba(0,0,0,0.22)]">
         <Link href="/" className="flex min-w-0 items-center gap-3 text-lg font-semibold tracking-[-0.03em]">
           <span className="flex h-10 w-10 items-center justify-center rounded-[18px] border border-white/55 bg-white/60 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] dark:border-white/12 dark:bg-white/8 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]">
             <Code2 className="h-4 w-4" />
@@ -88,17 +88,17 @@ export function Header() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 rounded-[22px] border border-white/55 bg-white/52 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-[18px] dark:border-white/10 dark:bg-white/7 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] md:flex">
+        <nav className="hidden items-center gap-5 md:flex">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`rounded-[18px] px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                className={`border-b-2 px-1 py-2 text-sm font-medium transition-colors duration-150 ${
                   isActive
-                    ? "border border-white/70 bg-white/78 text-foreground shadow-[0_8px_24px_rgba(15,23,42,0.08),inset_0_1px_0_rgba(255,255,255,0.86)] dark:border-white/14 dark:bg-white/12 dark:shadow-[0_8px_24px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.14)]"
-                    : "text-muted-foreground hover:bg-white/48 hover:text-foreground dark:hover:bg-white/8"
+                    ? "border-primary/75 text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {link.label}
@@ -108,7 +108,7 @@ export function Header() {
           {isDev && (
             <Link
               href="/jack/posts"
-              className="rounded-[18px] px-4 py-2 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:bg-white/48 hover:text-foreground dark:hover:bg-white/8"
+              className="border-b-2 border-transparent px-1 py-2 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground"
             >
               后台
             </Link>

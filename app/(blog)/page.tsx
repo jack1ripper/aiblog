@@ -101,7 +101,7 @@ export default async function HomePage() {
                 </p>
               </div>
             ) : (
-              <ul className="divide-y divide-border/70 border-y border-border/70">
+              <ul className="divide-y divide-border/70 border-b border-border/70">
                 {posts.map((post) => (
                   <PostListRow key={post.id} post={post} />
                 ))}
