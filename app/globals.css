@@ -50,24 +50,24 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --background: oklch(0.99 0.002 264);
+  --foreground: oklch(0.17 0.01 264);
+  --card: oklch(0.995 0.003 264);
+  --card-foreground: oklch(0.17 0.01 264);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(0.56 0.15 255);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --secondary: oklch(0.96 0.004 264);
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --muted: oklch(0.965 0.004 264);
+  --muted-foreground: oklch(0.49 0.015 264);
+  --accent: oklch(0.965 0.004 264);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.91 0.006 264);
+  --input: oklch(0.91 0.006 264);
+  --ring: oklch(0.72 0.04 255);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -85,19 +85,19 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: oklch(0.17 0.008 264);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: oklch(0.21 0.01 264);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(0.21 0.01 264);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
+  --primary: oklch(0.74 0.1 255);
   --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+  --secondary: oklch(0.26 0.008 264);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --muted: oklch(0.26 0.008 264);
+  --muted-foreground: oklch(0.76 0.01 264);
+  --accent: oklch(0.26 0.008 264);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -124,10 +124,29 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(circle at top, rgba(59, 130, 246, 0.08), transparent 28%),
+      linear-gradient(to bottom, transparent, transparent),
+      linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+    background-size: auto, auto, 24px 24px, 24px 24px;
+    background-position: center top, center, center, center;
   }
   html {
     @apply font-sans;
   }
+}
+
+.dark body {
+  background-image:
+    radial-gradient(circle at top, rgba(59, 130, 246, 0.16), transparent 30%),
+    linear-gradient(to bottom, transparent, transparent),
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--primary) 22%, transparent);
 }
 
 @keyframes blob {

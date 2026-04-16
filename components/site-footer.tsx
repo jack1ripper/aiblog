@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Rss, Mail } from "lucide-react";
-// import { NewsletterForm } from "@/components/newsletter-form";
 
 const footerLinks = [
   { href: "/", label: "首页" },
@@ -59,101 +58,102 @@ export function SiteFooter() {
   }
 
   return (
-    <footer className="border-t border-border/50 bg-muted/30">
-      <div className="container mx-auto px-4 py-14">
-        <div className="mx-auto max-w-3xl">
-          {/* Top section */}
-          <div className="grid gap-10 sm:grid-cols-[1fr_auto]">
-            {/* Brand */}
+    <footer className="border-t border-border/50 bg-muted/20">
+      <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid gap-8 rounded-[2rem] border border-border/70 bg-card/85 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)] sm:p-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
+          <div className="space-y-4">
             <div className="space-y-3">
-              <Link href="/" className="inline-block text-lg font-semibold tracking-tight">
+              <Link href="/" className="inline-block text-xl font-semibold tracking-[-0.03em]">
                 Dusk³
               </Link>
-              <p className="text-[13px] leading-relaxed text-muted-foreground">
-                Script & Style — 记录前端开发与生活随笔。
+              <p className="max-w-xl text-sm leading-7 text-muted-foreground">
+                Script & Style，记录前端开发、产品审美和一些不必过度包装的生活观察。
               </p>
-              <p className="text-xs text-muted-foreground/60">dusk3.com</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <span className="rounded-full border border-border/70 bg-muted/55 px-3 py-1 text-xs text-muted-foreground">
+                Technical Writing
+              </span>
+              <span className="rounded-full border border-border/70 bg-muted/55 px-3 py-1 text-xs text-muted-foreground">
+                Frontend Notes
+              </span>
+              <span className="rounded-full border border-border/70 bg-muted/55 px-3 py-1 text-xs text-muted-foreground">
+                Personal Essays
+              </span>
+            </div>
+          </div>
+
+          <div className="grid gap-8 sm:grid-cols-2">
+            <div className="space-y-3">
+              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+                Navigation
+              </p>
+              <ul className="space-y-2">
+                {footerLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            {/* Links + Social */}
-            <div className="flex gap-12 sm:gap-16">
-              <div className="space-y-3">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-foreground/80">
-                  页面
-                </p>
-                <ul className="space-y-2">
-                  {footerLinks.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="space-y-3">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-foreground/80">
-                  关注
-                </p>
-                <div className="flex gap-3">
-                  <a
-                    href="https://github.com"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-muted-foreground transition-colors hover:text-foreground"
-                    aria-label="GitHub"
+            <div className="space-y-3">
+              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+                Connect
+              </p>
+              <div className="flex gap-3">
+                <a
+                  href="https://github.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/80 text-muted-foreground transition-colors hover:text-foreground"
+                  aria-label="GitHub"
+                >
+                  <GithubSvg className="h-4 w-4" />
+                </a>
+                <a
+                  href="https://twitter.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/80 text-muted-foreground transition-colors hover:text-foreground"
+                  aria-label="Twitter"
+                >
+                  <TwitterSvg className="h-4 w-4" />
+                </a>
+                <a
+                  href="mailto:hello@example.com"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/80 text-muted-foreground transition-colors hover:text-foreground"
+                  aria-label="Email"
+                >
+                  <Mail className="h-4 w-4" />
+                </a>
+                <div className="relative">
+                  <button
+                    onClick={handleCopyRss}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background/80 text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label="RSS"
                   >
-                    <GithubSvg className="h-4 w-4" />
-                  </a>
-                  <a
-                    href="https://twitter.com"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-muted-foreground transition-colors hover:text-foreground"
-                    aria-label="Twitter"
-                  >
-                    <TwitterSvg className="h-4 w-4" />
-                  </a>
-                  <a
-                    href="mailto:hello@example.com"
-                    className="text-muted-foreground transition-colors hover:text-foreground"
-                    aria-label="Email"
-                  >
-                    <Mail className="h-4 w-4" />
-                  </a>
-                  <div className="relative">
-                    <button
-                      onClick={handleCopyRss}
-                      className="text-muted-foreground transition-colors hover:text-foreground"
-                      aria-label="RSS"
-                    >
-                      <Rss className="h-4 w-4" />
-                    </button>
-                    {showCopied && (
-                      <span className="absolute left-1/2 top-6 z-50 w-max max-w-[220px] -translate-x-1/2 rounded-md bg-foreground px-2 py-1 text-xs text-background shadow-lg">
-                        已复制 RSS 地址，可粘贴到阅读器订阅
-                      </span>
-                    )}
-                  </div>
+                    <Rss className="h-4 w-4" />
+                  </button>
+                  {showCopied && (
+                    <span className="absolute left-1/2 top-12 z-50 w-max max-w-[220px] -translate-x-1/2 rounded-md bg-foreground px-2 py-1 text-xs text-background shadow-lg">
+                      已复制 RSS 地址，可粘贴到阅读器订阅
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Divider */}
-          <div className="mt-12 border-t border-border/50" />
-
-          {/* Bottom section */}
-          <div className="mt-8 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-            <p className="text-xs text-muted-foreground/60">
-              © {new Date().getFullYear()} Dusk³
-            </p>
-            {/* <NewsletterForm /> */}
-          </div>
+        <div className="mt-6 flex flex-col gap-2 px-1 text-xs text-muted-foreground/70 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} Dusk³</p>
+          <p>更像个人出版物，而不是默认模板。</p>
         </div>
       </div>
     </footer>
