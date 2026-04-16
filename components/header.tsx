@@ -28,10 +28,33 @@ export function Header() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [showCopied, setShowCopied] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 0);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+
+    const updateHeaderVisibility = () => {
+      const currentScrollY = window.scrollY;
+      const delta = currentScrollY - lastScrollY;
+
+      if (currentScrollY < 24) {
+        setIsVisible(true);
+      } else if (delta > 8) {
+        setIsVisible(false);
+      } else if (delta < -8) {
+        setIsVisible(true);
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", updateHeaderVisibility, { passive: true });
+    return () => window.removeEventListener("scroll", updateHeaderVisibility);
   }, []);
 
   async function handleCopyRss(e: React.MouseEvent) {
@@ -47,7 +70,11 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full px-4 pt-4 sm:px-6 lg:px-8">
+    <header
+      className={`sticky top-0 z-50 w-full px-4 pt-4 transition-transform duration-300 ease-out sm:px-6 lg:px-8 ${
+        isVisible ? "translate-y-0" : "-translate-y-[calc(100%+1rem)]"
+      }`}
+    >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 rounded-[26px] border border-white/40 bg-white/55 px-4 py-3 shadow-[0_18px_48px_rgba(15,23,42,0.08)] backdrop-blur-[22px] dark:border-white/10 dark:bg-white/6 dark:shadow-[0_18px_48px_rgba(0,0,0,0.28)]">
         <Link href="/" className="flex min-w-0 items-center gap-3 text-lg font-semibold tracking-[-0.03em]">
           <span className="flex h-10 w-10 items-center justify-center rounded-[18px] border border-white/55 bg-white/60 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] dark:border-white/12 dark:bg-white/8 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]">
