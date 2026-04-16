@@ -111,7 +111,7 @@ export default async function HomePage() {
 
           <aside className="lg:col-span-4">
             <div className="space-y-4 lg:sticky lg:top-28">
-              <section className="rounded-xl border border-border/70 bg-card/65 p-4">
+              <section className="rounded-xl border border-sky-200/45 bg-[linear-gradient(145deg,rgba(255,255,255,0.82),rgba(240,249,255,0.9))] p-4 dark:border-sky-400/20 dark:bg-[linear-gradient(145deg,rgba(30,41,59,0.78),rgba(15,23,42,0.86))]">
                 <h2 className="text-sm font-semibold text-foreground">站内搜索</h2>
                 <form action="/search" method="get" className="mt-3 flex gap-2">
                   <input
@@ -129,7 +129,7 @@ export default async function HomePage() {
                 </form>
               </section>
 
-              <section className="hidden rounded-xl border border-border/70 bg-card/65 p-4 lg:block">
+              <section className="hidden rounded-xl border border-indigo-200/45 bg-[linear-gradient(145deg,rgba(255,255,255,0.82),rgba(238,242,255,0.88))] p-4 dark:border-indigo-400/20 dark:bg-[linear-gradient(145deg,rgba(30,41,59,0.78),rgba(30,27,75,0.82))] lg:block">
                 <h2 className="text-sm font-semibold text-foreground">分类与标签</h2>
                 <div className="mt-3 space-y-3">
                   {categories.length > 0 && (
@@ -161,7 +161,7 @@ export default async function HomePage() {
                 </div>
               </section>
 
-              <section className="rounded-xl border border-border/70 bg-card/65 p-4">
+              <section className="rounded-xl border border-amber-200/50 bg-[linear-gradient(145deg,rgba(255,255,255,0.82),rgba(255,251,235,0.88))] p-4 dark:border-amber-400/20 dark:bg-[linear-gradient(145deg,rgba(30,41,59,0.78),rgba(69,39,16,0.5))]">
                 <h2 className="text-sm font-semibold text-foreground">年份归档</h2>
                 {years.length > 0 ? (
                   <div className="mt-3 space-y-1">
@@ -181,7 +181,7 @@ export default async function HomePage() {
                 )}
               </section>
 
-              <section className="rounded-xl border border-border/70 bg-card/65 p-4">
+              <section className="rounded-xl border border-emerald-200/45 bg-[linear-gradient(145deg,rgba(255,255,255,0.82),rgba(236,253,245,0.88))] p-4 dark:border-emerald-400/20 dark:bg-[linear-gradient(145deg,rgba(30,41,59,0.78),rgba(6,78,59,0.45))]">
                 <h2 className="text-sm font-semibold text-foreground">最近更新</h2>
                 {latestPosts.length > 0 ? (
                   <ul className="mt-3 space-y-1.5">
@@ -201,7 +201,7 @@ export default async function HomePage() {
                 )}
               </section>
 
-              <section className="rounded-xl border border-border/70 bg-card/65 p-4 lg:hidden">
+              <section className="rounded-xl border border-border/70 bg-card/75 p-4 lg:hidden">
                 <div className="flex flex-wrap gap-2 text-xs">
                   <Link
                     href="/archive"
