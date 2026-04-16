@@ -1,87 +1,225 @@
 import Link from "next/link";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
-import { ArrowRight, FileText } from "lucide-react";
+import { ArrowRight, FileText, Search } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { PostCard } from "@/components/post-card";
+import { PostListRow } from "@/components/post-list-row";
 
 export default async function HomePage() {
-  const posts = await prisma.post.findMany({
-    where: { published: true },
-    orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
-    include: {
-      category: true,
-      tags: true,
-    },
-  });
+  const [posts, latestPosts, categoriesRaw, tagsRaw] = await Promise.all([
+    prisma.post.findMany({
+      where: { published: true },
+      orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        createdAt: true,
+        pinned: true,
+        category: { select: { name: true } },
+      },
+    }),
+    prisma.post.findMany({
+      where: { published: true },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      select: { id: true, title: true, slug: true },
+    }),
+    prisma.category.findMany({
+      where: { posts: { some: { published: true } } },
+      select: {
+        name: true,
+        posts: { where: { published: true }, select: { id: true } },
+      },
+    }),
+    prisma.tag.findMany({
+      where: { posts: { some: { published: true } } },
+      select: {
+        name: true,
+        posts: { where: { published: true }, select: { id: true } },
+      },
+    }),
+  ]);
+
+  const categories = categoriesRaw
+    .map((category) => ({ name: category.name, count: category.posts.length }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
+
+  const tags = tagsRaw
+    .map((tag) => ({ name: tag.name, count: tag.posts.length }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
 
   const featuredPost = posts[0];
+  const yearMap = posts.reduce<Record<string, number>>((acc, post) => {
+    const year = format(new Date(post.createdAt), "yyyy", { locale: zhCN });
+    acc[year] = (acc[year] || 0) + 1;
+    return acc;
+  }, {});
+  const years = Object.entries(yearMap)
+    .sort((a, b) => Number(b[0]) - Number(a[0]))
+    .slice(0, 6);
 
   return (
     <div className="relative">
-      <section className="mx-auto w-full max-w-6xl px-4 pb-5 pt-6 sm:px-6 sm:pt-8 lg:px-8">
-        <div className="rounded-[28px] border border-border/70 bg-card/78 px-5 py-5 shadow-[0_18px_60px_rgba(15,23,42,0.06)] backdrop-blur sm:px-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="space-y-2">
-              <h1 className="text-2xl font-semibold tracking-[-0.04em] text-foreground sm:text-3xl">
-                文章列表
-              </h1>
-              <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
-                以时间线方式浏览全部内容，置顶文章优先展示，帮助你快速找到最新和最重要的更新。
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 text-sm">
-              <span className="rounded-full border border-border/70 bg-background/80 px-3 py-1.5 text-muted-foreground">
-                共 {posts.length} 篇
+      <section className="mx-auto w-full max-w-6xl px-4 pb-3 pt-6 sm:px-6 sm:pt-8 lg:px-8">
+        <div className="flex items-center justify-between border-b border-border/70 pb-3">
+          <h1 className="text-xl font-semibold tracking-[-0.03em] text-foreground sm:text-2xl">
+            文章列表
+          </h1>
+          <div className="flex items-center gap-2 text-xs sm:text-sm">
+            <span className="rounded-full border border-border/70 bg-background/80 px-2.5 py-1 text-muted-foreground sm:px-3 sm:py-1.5">
+              共 {posts.length} 篇
+            </span>
+            {featuredPost && (
+              <span className="hidden rounded-full border border-border/70 bg-background/80 px-3 py-1.5 text-muted-foreground sm:inline-flex">
+                最近更新 {format(new Date(featuredPost.createdAt), "yyyy.MM.dd", { locale: zhCN })}
               </span>
-              {featuredPost && (
-                <span className="rounded-full border border-border/70 bg-background/80 px-3 py-1.5 text-muted-foreground">
-                  最近更新 {format(new Date(featuredPost.createdAt), "yyyy.MM.dd", { locale: zhCN })}
-                </span>
-              )}
-              <Link
-                href="/archive"
-                className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/80 px-3 py-1.5 text-foreground transition-colors hover:bg-background"
-              >
-                查看归档
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+            )}
+            <Link
+              href="/archive"
+              className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-background/80 px-2.5 py-1 text-foreground transition-colors hover:bg-background sm:px-3 sm:py-1.5"
+            >
+              归档
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
-          {posts.length > 0 && (
-            <div className="mt-4 grid gap-2 border-t border-border/70 pt-4 text-xs text-muted-foreground sm:grid-cols-3 sm:text-sm">
-              <p className="rounded-xl bg-background/60 px-3 py-2">
-                首屏聚焦列表，减少冗余模块干扰阅读入口。
-              </p>
-              <p className="rounded-xl bg-background/60 px-3 py-2">
-                上方保留关键指标，快速建立内容密度感知。
-              </p>
-              <p className="rounded-xl bg-background/60 px-3 py-2">
-                通过归档入口承接深度浏览，缩短查找路径。
-              </p>
-            </div>
-          )}
         </div>
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-6 lg:px-8">
-        {posts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-24 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-              <FileText className="h-5 w-5 text-muted-foreground" />
+        <div className="grid gap-8 lg:grid-cols-12">
+          <div className="lg:col-span-8">
+            {posts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-24 text-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <FileText className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <p className="mt-4 text-sm text-muted-foreground">
+                  暂无文章，稍后再来看看吧
+                </p>
+              </div>
+            ) : (
+              <ul className="divide-y divide-border/70 border-y border-border/70">
+                {posts.map((post) => (
+                  <PostListRow key={post.id} post={post} />
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <aside className="lg:col-span-4">
+            <div className="space-y-4 lg:sticky lg:top-28">
+              <section className="rounded-xl border border-border/70 bg-card/65 p-4">
+                <h2 className="text-sm font-semibold text-foreground">站内搜索</h2>
+                <form action="/search" method="get" className="mt-3 flex gap-2">
+                  <input
+                    name="q"
+                    placeholder="关键词..."
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition-colors duration-150 focus:border-primary"
+                  />
+                  <button
+                    type="submit"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label="搜索"
+                  >
+                    <Search className="h-4 w-4" />
+                  </button>
+                </form>
+              </section>
+
+              <section className="hidden rounded-xl border border-border/70 bg-card/65 p-4 lg:block">
+                <h2 className="text-sm font-semibold text-foreground">分类与标签</h2>
+                <div className="mt-3 space-y-3">
+                  {categories.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {categories.map((category) => (
+                        <Link
+                          key={category.name}
+                          href={`/categories/${encodeURIComponent(category.name)}`}
+                          className="rounded-md border border-border/70 px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          {category.name} ({category.count})
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                  {tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {tags.map((tag) => (
+                        <Link
+                          key={tag.name}
+                          href={`/tags/${encodeURIComponent(tag.name)}`}
+                          className="rounded-md border border-border/70 px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          #{tag.name} ({tag.count})
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <section className="rounded-xl border border-border/70 bg-card/65 p-4">
+                <h2 className="text-sm font-semibold text-foreground">年份归档</h2>
+                {years.length > 0 ? (
+                  <div className="mt-3 space-y-1">
+                    {years.map(([year, count]) => (
+                      <Link
+                        key={year}
+                        href={`/archive#year-${year}`}
+                        className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
+                      >
+                        <span>{year}</span>
+                        <span>{count} 篇</span>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-3 text-sm text-muted-foreground">暂无归档数据</p>
+                )}
+              </section>
+
+              <section className="rounded-xl border border-border/70 bg-card/65 p-4">
+                <h2 className="text-sm font-semibold text-foreground">最近更新</h2>
+                {latestPosts.length > 0 ? (
+                  <ul className="mt-3 space-y-1.5">
+                    {latestPosts.map((post) => (
+                      <li key={post.id}>
+                        <Link
+                          href={`/posts/${post.slug}`}
+                          className="line-clamp-1 block rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
+                        >
+                          {post.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-3 text-sm text-muted-foreground">暂无更新</p>
+                )}
+              </section>
+
+              <section className="rounded-xl border border-border/70 bg-card/65 p-4 lg:hidden">
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <Link
+                    href="/archive"
+                    className="rounded-md border border-border/70 px-2 py-1 text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    查看全部归档
+                  </Link>
+                  <Link
+                    href="/search"
+                    className="rounded-md border border-border/70 px-2 py-1 text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    进入搜索页
+                  </Link>
+                </div>
+              </section>
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">
-              暂无文章，稍后再来看看吧
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-          </div>
-        )}
+          </aside>
+        </div>
       </section>
     </div>
   );

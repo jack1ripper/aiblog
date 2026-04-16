@@ -36,7 +36,7 @@ export default async function ArchivePage() {
       ) : (
         <div className="space-y-12">
           {Object.entries(grouped).map(([year, yearPosts]) => (
-            <section key={year} className="relative">
+            <section id={`year-${year}`} key={year} className="relative scroll-mt-28">
               {/* Section-local timeline line */}
               <div
                 className="absolute left-4 top-3 bottom-0 z-0 w-px -translate-x-1/2 bg-border sm:left-6 sm:top-4"
