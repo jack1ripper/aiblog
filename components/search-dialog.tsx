@@ -137,91 +137,91 @@ export function SearchDialog() {
       <Button
         variant="ghost"
         size="icon"
-        className="h-9 w-9 rounded-full"
+        className="h-10 w-10 rounded-[18px] border border-white/55 bg-white/56 shadow-[inset_0_1px_0_rgba(255,255,255,0.78)] dark:border-white/10 dark:bg-white/8 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]"
         onClick={() => setOpen(true)}
         aria-label="搜索"
       >
         <Search className="h-4 w-4" />
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg gap-0 overflow-hidden p-0">
-        <DialogTitle className="sr-only">搜索文章</DialogTitle>
-        <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <Input
-            ref={inputRef}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="搜索文章标题、内容或标签…"
-            className="h-8 flex-1 border-0 bg-transparent px-0 text-sm shadow-none focus-visible:ring-0"
-          />
-          {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-        </div>
-        <div className="max-h-[60vh] overflow-y-auto">
-          {query.trim() === "" ? (
-            <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-              输入关键词开始搜索
+        <DialogContent className="max-w-lg gap-0 overflow-hidden rounded-[28px] border border-white/45 bg-white/72 p-0 shadow-[0_24px_80px_rgba(15,23,42,0.14)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#111318]/88 dark:shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+          <DialogTitle className="sr-only">搜索文章</DialogTitle>
+          <div className="flex items-center gap-2 border-b border-border/60 px-4 py-3">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <Input
+              ref={inputRef}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="搜索文章标题、内容或标签…"
+              className="h-8 flex-1 border-0 bg-transparent px-0 text-sm shadow-none focus-visible:ring-0"
+            />
+            {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+          </div>
+          <div className="max-h-[60vh] overflow-y-auto">
+            {query.trim() === "" ? (
+              <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+                输入关键词开始搜索
+              </div>
+            ) : posts.length === 0 ? (
+              <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+                未找到相关文章
+              </div>
+            ) : (
+              <ul className="py-2">
+                {posts.map((post, idx) => (
+                  <li key={post.id}>
+                    <button
+                      onClick={() => handleSelect(post.slug)}
+                      className={cn(
+                        "w-full px-4 py-3 text-left transition-colors hover:bg-muted/70 focus:bg-muted/70 focus:outline-none",
+                        idx !== posts.length - 1 && "border-b border-border/40"
+                      )}
+                    >
+                      <div className="text-sm font-medium text-foreground">
+                        <Highlight text={post.title} keyword={query} />
+                      </div>
+                      <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                        <Highlight
+                          text={getExcerpt(post, query)}
+                          keyword={query}
+                        />
+                      </div>
+                      <div className="mt-1 text-[10px] text-muted-foreground/70">
+                        {formatDate(post.createdAt)}
+                      </div>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div className="flex items-center justify-between border-t border-border/60 bg-black/[0.02] px-4 py-2 text-[10px] text-muted-foreground dark:bg-white/[0.03]">
+            <div className="flex items-center gap-3">
+              <span>
+                <kbd className="rounded border border-border bg-background px-1 py-0.5 font-mono">
+                  ↑
+                </kbd>{" "}
+                <kbd className="rounded border border-border bg-background px-1 py-0.5 font-mono">
+                  ↓
+                </kbd>{" "}
+                选择
+              </span>
+              <span>
+                <kbd className="rounded border border-border bg-background px-1 py-0.5 font-mono">
+                  ↵
+                </kbd>{" "}
+                打开
+              </span>
             </div>
-          ) : posts.length === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-              未找到相关文章
-            </div>
-          ) : (
-            <ul className="py-2">
-              {posts.map((post, idx) => (
-                <li key={post.id}>
-                  <button
-                    onClick={() => handleSelect(post.slug)}
-                    className={cn(
-                      "w-full px-4 py-3 text-left transition-colors hover:bg-muted focus:bg-muted focus:outline-none",
-                      idx !== posts.length - 1 && "border-b border-border/50"
-                    )}
-                  >
-                    <div className="text-sm font-medium text-foreground">
-                      <Highlight text={post.title} keyword={query} />
-                    </div>
-                    <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                      <Highlight
-                        text={getExcerpt(post, query)}
-                        keyword={query}
-                      />
-                    </div>
-                    <div className="mt-1 text-[10px] text-muted-foreground/70">
-                      {formatDate(post.createdAt)}
-                    </div>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-        <div className="flex items-center justify-between border-t border-border bg-muted/30 px-4 py-2 text-[10px] text-muted-foreground">
-          <div className="flex items-center gap-3">
             <span>
               <kbd className="rounded border border-border bg-background px-1 py-0.5 font-mono">
-                ↑
+                Esc
               </kbd>{" "}
-              <kbd className="rounded border border-border bg-background px-1 py-0.5 font-mono">
-                ↓
-              </kbd>{" "}
-              选择
-            </span>
-            <span>
-              <kbd className="rounded border border-border bg-background px-1 py-0.5 font-mono">
-                ↵
-              </kbd>{" "}
-              打开
+              关闭
             </span>
           </div>
-          <span>
-            <kbd className="rounded border border-border bg-background px-1 py-0.5 font-mono">
-              Esc
-            </kbd>{" "}
-            关闭
-          </span>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
