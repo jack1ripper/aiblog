@@ -149,6 +149,117 @@
   background: color-mix(in oklab, var(--primary) 22%, transparent);
 }
 
+.liquid-header {
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 78%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--background) 72%, white 28%) 0%,
+      color-mix(in oklab, var(--background) 84%, transparent) 100%
+    );
+  box-shadow:
+    0 10px 38px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  backdrop-filter: saturate(165%) blur(24px);
+  -webkit-backdrop-filter: saturate(165%) blur(24px);
+}
+
+.dark .liquid-header {
+  box-shadow:
+    0 12px 42px rgba(0, 0, 0, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.liquid-nav {
+  position: relative;
+  border: 1px solid color-mix(in oklab, var(--border) 86%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--card) 70%, white 30%) 0%,
+      color-mix(in oklab, var(--card) 88%, transparent) 100%
+    );
+  box-shadow:
+    0 14px 36px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.76),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.08);
+  backdrop-filter: saturate(175%) blur(22px);
+  -webkit-backdrop-filter: saturate(175%) blur(22px);
+}
+
+.dark .liquid-nav {
+  box-shadow:
+    0 16px 44px rgba(0, 0, 0, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.22);
+}
+
+.liquid-nav::before {
+  content: "";
+  position: absolute;
+  inset: 1px 12px auto 12px;
+  height: 35%;
+  pointer-events: none;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0));
+}
+
+.dark .liquid-nav::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0));
+}
+
+.liquid-nav-item {
+  position: relative;
+}
+
+.liquid-nav-item:hover {
+  background: color-mix(in oklab, var(--card) 72%, white 28%);
+}
+
+.dark .liquid-nav-item:hover {
+  background: color-mix(in oklab, var(--card) 80%, white 20%);
+}
+
+.liquid-nav-item-active {
+  border: 1px solid color-mix(in oklab, var(--border) 82%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--background) 40%, white 60%) 0%,
+      color-mix(in oklab, var(--card) 92%, transparent) 100%
+    );
+  box-shadow:
+    0 10px 20px rgba(15, 23, 42, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+.dark .liquid-nav-item-active {
+  box-shadow:
+    0 12px 26px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.liquid-chip {
+  border: 1px solid color-mix(in oklab, var(--border) 82%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--card) 66%, white 34%) 0%,
+      color-mix(in oklab, var(--card) 90%, transparent) 100%
+    );
+  box-shadow:
+    0 8px 22px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(170%) blur(16px);
+  -webkit-backdrop-filter: saturate(170%) blur(16px);
+}
+
+.dark .liquid-chip {
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
 @keyframes blob {
   0% {
     transform: translate(0px, 0px) scale(1);
