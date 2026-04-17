@@ -98,7 +98,7 @@ export default async function PostPage({ params }: PostPageProps) {
       <ReadingProgress />
       <ScrollToTop />
       <MobileBackHandle />
-      <div className="mx-auto flex max-w-6xl gap-12">
+      <div className="mx-auto flex max-w-6xl items-start gap-12">
         <article className="min-w-0 flex-1">
           <header className="mb-8">
             <div className="mb-3 flex flex-wrap gap-2">
@@ -210,7 +210,7 @@ export default async function PostPage({ params }: PostPageProps) {
           <GiscusComments />
         </article>
 
-        <aside className="hidden w-56 shrink-0 xl:sticky xl:top-24 xl:block xl:self-start">
+        <aside className="hidden w-56 shrink-0 xl:block">
           <Toc />
         </aside>
       </div>
