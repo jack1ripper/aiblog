@@ -124,10 +124,10 @@
   }
   body {
     @apply bg-background text-foreground;
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
     background-image:
-      radial-gradient(1200px 640px at 10% -16%, rgba(56, 189, 248, 0.18), transparent 62%),
-      radial-gradient(950px 540px at 88% -20%, rgba(14, 165, 233, 0.1), transparent 66%),
-      radial-gradient(900px 500px at 50% 120%, rgba(251, 191, 36, 0.08), transparent 72%),
       linear-gradient(180deg, rgba(246, 249, 255, 0.96), rgba(240, 246, 255, 0.98));
     background-attachment: fixed;
     background-repeat: no-repeat;
@@ -139,11 +139,43 @@
 
 .dark body {
   background-image:
-    radial-gradient(1200px 700px at 12% -16%, rgba(56, 189, 248, 0.24), transparent 62%),
-    radial-gradient(900px 520px at 96% -22%, rgba(14, 165, 233, 0.14), transparent 68%),
-    radial-gradient(980px 560px at 46% 118%, rgba(250, 204, 21, 0.08), transparent 72%),
     linear-gradient(180deg, rgba(15, 23, 42, 0.4), rgba(10, 12, 18, 0.92));
   background-repeat: no-repeat;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  pointer-events: none;
+  z-index: -1;
+  width: 56vmax;
+  height: 56vmax;
+  border-radius: 999px;
+  filter: blur(90px);
+  opacity: 0.58;
+}
+
+body::before {
+  left: -18vmax;
+  top: -20vmax;
+  background: radial-gradient(circle at 30% 30%, rgba(56, 189, 248, 0.44), rgba(56, 189, 248, 0));
+}
+
+body::after {
+  right: -20vmax;
+  bottom: -24vmax;
+  background: radial-gradient(circle at 60% 45%, rgba(250, 204, 21, 0.3), rgba(250, 204, 21, 0));
+}
+
+.dark body::before {
+  opacity: 0.48;
+  background: radial-gradient(circle at 30% 30%, rgba(56, 189, 248, 0.36), rgba(56, 189, 248, 0));
+}
+
+.dark body::after {
+  opacity: 0.38;
+  background: radial-gradient(circle at 60% 45%, rgba(59, 130, 246, 0.28), rgba(59, 130, 246, 0));
 }
 
 ::selection {

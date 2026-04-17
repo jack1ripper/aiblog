@@ -64,7 +64,7 @@ export default async function HomePage() {
   return (
     <div className="relative">
       <section className="mx-auto w-full max-w-6xl px-4 pb-3 pt-6 sm:px-6 sm:pt-8 lg:px-8">
-        <div className="flex items-center justify-between border-b border-border/70 pb-3">
+        <div className="flex items-center justify-between pb-3">
           <h1 className="text-xl font-semibold tracking-[-0.03em] text-foreground sm:text-2xl">
             文章列表
           </h1>
@@ -101,7 +101,7 @@ export default async function HomePage() {
                 </p>
               </div>
             ) : (
-              <ul className="divide-y divide-border/70 border-b border-border/70">
+              <ul className="space-y-1">
                 {posts.map((post) => (
                   <PostListRow key={post.id} post={post} />
                 ))}
