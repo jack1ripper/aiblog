@@ -31,7 +31,7 @@ export function PostListRow({ post }: PostListRowProps) {
 
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-center gap-1.5">
-            <h2 className="min-w-0 flex-1 truncate text-sm font-medium text-foreground transition-colors duration-150 group-hover:text-primary sm:text-[15px]">
+            <h2 className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium text-foreground transition-colors duration-150 group-hover:text-primary sm:text-[15px]">
               {post.title}
             </h2>
             {post.pinned && (

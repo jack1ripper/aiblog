@@ -186,6 +186,25 @@ body::after {
   background: radial-gradient(circle at 60% 45%, rgba(244, 114, 182, 0.24), rgba(59, 130, 246, 0.14));
 }
 
+.safe-x {
+  padding-left: calc(env(safe-area-inset-left) + 1rem);
+  padding-right: calc(env(safe-area-inset-right) + 1rem);
+}
+
+@media (min-width: 640px) {
+  .safe-x {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .safe-x {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
 ::selection {
   background: color-mix(in oklab, var(--primary) 22%, transparent);
 }

@@ -94,7 +94,7 @@ export default async function PostPage({ params }: PostPageProps) {
   const readTime = Math.max(1, Math.ceil(wordCount / 500));
 
   return (
-    <div className="container mx-auto py-10 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:px-6 lg:px-8">
+    <div className="safe-x container mx-auto py-10">
       <ReadingProgress />
       <ScrollToTop />
       <MobileBackHandle />

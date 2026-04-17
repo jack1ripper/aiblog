@@ -72,7 +72,7 @@ export function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-4 transition-transform duration-300 ease-out sm:px-6 lg:px-8 ${
+      className={`safe-x sticky top-0 z-50 w-full pt-4 transition-transform duration-300 ease-out ${
         isVisible ? "translate-y-0" : "-translate-y-[calc(100%+1rem)]"
       }`}
     >

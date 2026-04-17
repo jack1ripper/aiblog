@@ -59,7 +59,7 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-border/50 bg-muted/20">
-      <div className="mx-auto w-full max-w-6xl pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] py-16 sm:px-6 lg:px-8">
+      <div className="safe-x mx-auto w-full max-w-6xl py-16">
         <div className="grid gap-8 rounded-[2rem] border border-border/70 bg-card/85 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.06)] sm:p-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
           <div className="space-y-4">
             <div className="space-y-3">
