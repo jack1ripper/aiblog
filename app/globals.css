@@ -187,8 +187,8 @@ body::after {
 }
 
 .safe-x {
-  padding-left: calc(env(safe-area-inset-left) + 1rem);
-  padding-right: calc(env(safe-area-inset-right) + 1rem);
+  padding-left: calc(env(safe-area-inset-left, 0px) + 1rem);
+  padding-right: calc(env(safe-area-inset-right, 0px) + 1rem);
 }
 
 @media (min-width: 640px) {

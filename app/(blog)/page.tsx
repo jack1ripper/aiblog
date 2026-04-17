@@ -66,7 +66,7 @@ export default async function HomePage() {
       <section className="safe-x mx-auto w-full max-w-6xl pt-6 pb-10 sm:pt-8">
         <div className="grid gap-8 lg:grid-cols-12">
           <div className="min-w-0 lg:col-span-8">
-            <div className="mb-5 flex items-end justify-between">
+            <div className="mb-5 flex min-w-0 items-end justify-between gap-4">
               <div className="space-y-1">
                 <h1 className="text-xl font-semibold tracking-[-0.03em] text-foreground sm:text-2xl">
                   最新文章
@@ -94,7 +94,7 @@ export default async function HomePage() {
                 </p>
               </div>
             ) : (
-              <div className="relative w-full overflow-hidden">
+              <div className="relative min-w-0 w-full overflow-hidden">
                 <span
                   aria-hidden="true"
                   className="absolute top-2 bottom-2 left-2.5 w-px bg-border/65"
@@ -163,7 +163,7 @@ export default async function HomePage() {
                         <Link
                           key={category.name}
                           href={`/categories/${encodeURIComponent(category.name)}`}
-                          className="rounded-md border border-border/70 px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                          className="max-w-full break-words rounded-md border border-border/70 px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
                         >
                           {category.name} ({category.count})
                         </Link>
@@ -176,7 +176,7 @@ export default async function HomePage() {
                         <Link
                           key={tag.name}
                           href={`/tags/${encodeURIComponent(tag.name)}`}
-                          className="rounded-md border border-border/70 px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                          className="max-w-full break-words rounded-md border border-border/70 px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
                         >
                           #{tag.name} ({tag.count})
                         </Link>
@@ -194,7 +194,7 @@ export default async function HomePage() {
                       <li key={post.id}>
                         <Link
                           href={`/posts/${post.slug}`}
-                          className="line-clamp-1 block rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
+                          className="line-clamp-1 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
                         >
                           {post.title}
                         </Link>
