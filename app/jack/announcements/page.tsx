@@ -92,7 +92,7 @@ export default function AdminAnnouncementsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold">站点通知</h1>
         <Link href="/jack/announcements/new">
           <Button>新建通知</Button>
@@ -105,7 +105,59 @@ export default function AdminAnnouncementsPage() {
         </Alert>
       )}
 
-      <div className="rounded-md border">
+      <div className="space-y-3 md:hidden">
+        {items.length === 0 ? (
+          <div className="rounded-md border p-5 text-center text-sm text-muted-foreground">暂无通知</div>
+        ) : (
+          items.map((item) => (
+            <article key={item.id} className="space-y-3 rounded-md border p-4">
+              <div className="space-y-2">
+                {item.link ? (
+                  <a
+                    href={item.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block break-words text-sm font-medium leading-6 hover:underline"
+                  >
+                    {item.content}
+                  </a>
+                ) : (
+                  <p className="break-words text-sm font-medium leading-6">{item.content}</p>
+                )}
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <Badge variant={item.isActive ? "default" : "secondary"}>
+                    {item.isActive ? "启用" : "停用"}
+                  </Badge>
+                  <span>{item.type === "banner" ? "横幅" : "浮层"}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {item.startAt || item.endAt
+                    ? `${item.startAt ? new Date(item.startAt).toLocaleString("zh-CN") : "不限"} ~ ${
+                        item.endAt ? new Date(item.endAt).toLocaleString("zh-CN") : "不限"
+                      }`
+                    : "永久"}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Link href={`/jack/announcements/${item.id}/edit`}>
+                  <Button size="sm" variant="outline">
+                    编辑
+                  </Button>
+                </Link>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleDelete(item.id)}
+                >
+                  删除
+                </Button>
+              </div>
+            </article>
+          ))
+        )}
+      </div>
+
+      <div className="hidden rounded-md border md:block">
         <Table>
           <TableHeader>
             <TableRow>

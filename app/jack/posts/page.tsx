@@ -117,7 +117,7 @@ export default function AdminPostsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold">文章管理</h1>
         <Link href="/jack/posts/new">
           <Button>新建文章</Button>
@@ -130,7 +130,59 @@ export default function AdminPostsPage() {
         </Alert>
       )}
 
-      <div className="rounded-md border">
+      <div className="space-y-3 md:hidden">
+        {posts.length === 0 ? (
+          <div className="rounded-md border p-5 text-center text-sm text-muted-foreground">暂无文章</div>
+        ) : (
+          posts.map((post) => (
+            <article key={post.id} className="space-y-3 rounded-md border p-4">
+              <div className="space-y-2">
+                <Link
+                  href={`/posts/${post.slug}`}
+                  target="_blank"
+                  className="block break-words text-sm font-medium leading-6 hover:underline"
+                >
+                  {post.title}
+                </Link>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  {post.published ? (
+                    <Badge variant="default">已发布</Badge>
+                  ) : (
+                    <Badge variant="secondary">草稿</Badge>
+                  )}
+                  {post.pinned && <Badge variant="default">置顶</Badge>}
+                  <span>{format(new Date(post.createdAt), "yyyy-MM-dd")}</span>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {!post.published && (
+                  <Button
+                    size="sm"
+                    disabled={publishingId === post.id}
+                    onClick={() => handlePublish(post)}
+                  >
+                    {publishingId === post.id ? "发布中..." : "发布"}
+                  </Button>
+                )}
+                <Link href={`/jack/posts/${post.id}/edit`}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-border hover:border-transparent hover:bg-muted"
+                  >
+                    编辑
+                  </Button>
+                </Link>
+                <Button size="sm" variant="destructive" onClick={() => handleDelete(post.id)}>
+                  删除
+                </Button>
+              </div>
+            </article>
+          ))
+        )}
+      </div>
+
+      <div className="hidden rounded-md border md:block">
         <Table>
           <TableHeader>
             <TableRow>

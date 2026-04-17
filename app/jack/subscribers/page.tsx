@@ -106,7 +106,39 @@ export default function AdminSubscribersPage() {
         </Alert>
       )}
 
-      <div className="rounded-md border">
+      <div className="space-y-3 md:hidden">
+        {items.length === 0 ? (
+          <div className="rounded-md border p-5 text-center text-sm text-muted-foreground">暂无订阅者</div>
+        ) : (
+          items.map((item) => (
+            <article key={item.id} className="space-y-3 rounded-md border p-4">
+              <div className="space-y-2">
+                <p className="break-all text-sm font-medium">{item.email}</p>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <Badge variant={item.isActive ? "default" : "secondary"}>
+                    {item.isActive ? "已订阅" : "已取消"}
+                  </Badge>
+                  <span>{new Date(item.subscribedAt).toLocaleString("zh-CN")}</span>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                variant={item.isActive ? "outline" : "default"}
+                disabled={updatingId === item.id}
+                onClick={() => toggleStatus(item.id, item.isActive)}
+              >
+                {updatingId === item.id
+                  ? "更新中..."
+                  : item.isActive
+                    ? "取消订阅"
+                    : "恢复订阅"}
+              </Button>
+            </article>
+          ))
+        )}
+      </div>
+
+      <div className="hidden rounded-md border md:block">
         <Table>
           <TableHeader>
             <TableRow>
