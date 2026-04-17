@@ -187,14 +187,18 @@ body::after {
 }
 
 .safe-x {
-  padding-left: calc(env(safe-area-inset-left, 0px) + 1rem);
-  padding-right: calc(env(safe-area-inset-right, 0px) + 1rem);
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-left: calc(1rem + env(safe-area-inset-left));
+  padding-right: calc(1rem + env(safe-area-inset-right));
 }
 
 @media (min-width: 640px) {
   .safe-x {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+    padding-left: calc(1.5rem + env(safe-area-inset-left));
+    padding-right: calc(1.5rem + env(safe-area-inset-right));
   }
 }
 
@@ -202,6 +206,8 @@ body::after {
   .safe-x {
     padding-left: 2rem;
     padding-right: 2rem;
+    padding-left: calc(2rem + env(safe-area-inset-left));
+    padding-right: calc(2rem + env(safe-area-inset-right));
   }
 }
 
