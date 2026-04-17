@@ -65,8 +65,9 @@ export default async function HomePage() {
     <div className="relative">
       <section className="mx-auto w-full max-w-6xl px-4 pb-3 pt-6 sm:px-6 sm:pt-8 lg:px-8">
         <div className="flex items-center justify-between pb-3">
-          <h1 className="text-xl font-semibold tracking-[-0.03em] text-foreground sm:text-2xl">
-            文章列表
+          <h1 className="inline-flex items-center gap-2 text-lg text-foreground/90 sm:text-2xl">
+            <span className="h-2 w-2 rounded-full bg-primary/70" />
+            <span className="font-semibold tracking-[-0.02em]">最新文章</span>
           </h1>
           <div className="flex items-center gap-2 text-xs sm:text-sm">
             <span className="rounded-full border border-border/70 bg-background/80 px-2.5 py-1 text-muted-foreground sm:px-3 sm:py-1.5">
@@ -101,11 +102,13 @@ export default async function HomePage() {
                 </p>
               </div>
             ) : (
-              <ul className="space-y-1">
-                {posts.map((post) => (
-                  <PostListRow key={post.id} post={post} />
-                ))}
-              </ul>
+              <div className="rounded-xl border border-border/70 bg-card/55 p-1.5 sm:p-2">
+                <ul className="space-y-0.5">
+                  {posts.map((post) => (
+                    <PostListRow key={post.id} post={post} />
+                  ))}
+                </ul>
+              </div>
             )}
           </div>
 

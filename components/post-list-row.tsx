@@ -19,15 +19,15 @@ export function PostListRow({ post }: PostListRowProps) {
     <li>
       <Link
         href={`/posts/${post.slug}`}
-        className="group flex items-center gap-3 rounded-lg px-2 py-3 transition-colors duration-150 hover:bg-muted/45 focus-visible:bg-muted/45 focus-visible:outline-none"
+        className="group flex items-center gap-2.5 rounded-md px-2 py-2 transition-colors duration-150 hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:outline-none"
       >
         <time className="w-16 shrink-0 text-[11px] font-medium tabular-nums text-muted-foreground sm:w-20 sm:text-xs">
           {format(new Date(post.createdAt), "MM.dd", { locale: zhCN })}
         </time>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h2 className="truncate text-sm font-medium text-foreground transition-colors duration-150 group-hover:text-primary sm:text-base">
+          <div className="flex items-center gap-1.5">
+            <h2 className="truncate text-sm font-medium text-foreground transition-colors duration-150 group-hover:text-primary sm:text-[15px]">
               {post.title}
             </h2>
             {post.pinned && (

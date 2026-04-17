@@ -29,6 +29,7 @@ export function Header() {
   const [mounted, setMounted] = useState(false);
   const [showCopied, setShowCopied] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 0);
@@ -145,18 +146,8 @@ export function Header() {
             </>
           )}
 
-          <Sheet>
-            <SheetTrigger
-              className="md:hidden"
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 rounded-[18px] border border-white/55 bg-white/56 shadow-[inset_0_1px_0_rgba(255,255,255,0.78)] dark:border-white/10 dark:bg-white/8 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]"
-                  aria-label="打开菜单"
-                />
-              }
-            >
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+            <SheetTrigger className="inline-flex h-10 w-10 items-center justify-center rounded-[18px] border border-white/55 bg-white/56 shadow-[inset_0_1px_0_rgba(255,255,255,0.78)] md:hidden dark:border-white/10 dark:bg-white/8 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
               <Menu className="h-5 w-5" />
             </SheetTrigger>
             <SheetContent side="right" className="border-white/10 bg-background/92 backdrop-blur-xl">
@@ -167,6 +158,7 @@ export function Header() {
                     <Link
                       key={link.href}
                       href={link.href}
+                      onClick={() => setIsSheetOpen(false)}
                       className={`rounded-[18px] px-4 py-3 text-base font-medium transition-colors ${
                         isActive
                           ? "bg-foreground text-background"
@@ -180,6 +172,7 @@ export function Header() {
                 {isDev && (
                   <Link
                     href="/jack/posts"
+                    onClick={() => setIsSheetOpen(false)}
                     className="rounded-[18px] px-4 py-3 text-base font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
                   >
                     后台
