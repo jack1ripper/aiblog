@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -25,11 +26,23 @@ interface Post {
   createdAt: string;
 }
 
+interface ImportedPostResult {
+  id: string;
+  title: string;
+  slug: string;
+  published: boolean;
+  editPath: string;
+}
+
 export default function AdminPostsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [importUrl, setImportUrl] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState("");
+  const [importResult, setImportResult] = useState<ImportedPostResult | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -97,6 +110,47 @@ export default function AdminPostsPage() {
     setPublishingId(null);
   }
 
+  async function handleImportFromUrl() {
+    if (!importUrl.trim()) {
+      setImportError("请先粘贴博客地址");
+      return;
+    }
+
+    setImportError("");
+    setImportResult(null);
+    setImporting(true);
+
+    try {
+      const res = await fetch("/api/admin/import-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: importUrl.trim(), published: false }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "导入失败");
+      }
+
+      setImportResult(data);
+      setImportUrl("");
+      setPosts((prev) => [
+        {
+          id: data.id,
+          title: data.title,
+          slug: data.slug,
+          published: data.published,
+          pinned: false,
+          createdAt: new Date().toISOString(),
+        },
+        ...prev,
+      ]);
+    } catch (err: unknown) {
+      setImportError(err instanceof Error ? err.message : "导入失败");
+    } finally {
+      setImporting(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -129,6 +183,37 @@ export default function AdminPostsPage() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
+      <div className="rounded-md border bg-muted/20 p-4">
+        <div className="mb-3 space-y-1">
+          <h2 className="text-sm font-semibold">URL 自动导入</h2>
+          <p className="text-xs text-muted-foreground">
+            粘贴文章链接后，系统会自动抓取正文并保存为草稿，你可以再进入编辑器二次润色。
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Input
+            value={importUrl}
+            onChange={(e) => setImportUrl(e.target.value)}
+            placeholder="https://example.com/blog/post"
+            className="flex-1"
+          />
+          <Button onClick={handleImportFromUrl} disabled={importing}>
+            {importing ? "导入中..." : "导入为草稿"}
+          </Button>
+        </div>
+        {importError && (
+          <p className="mt-2 text-xs text-destructive">{importError}</p>
+        )}
+        {importResult && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            导入成功：{importResult.title}。
+            <Link href={importResult.editPath} className="ml-1 underline underline-offset-2">
+              去编辑
+            </Link>
+          </p>
+        )}
+      </div>
 
       <div className="space-y-3 md:hidden">
         {posts.length === 0 ? (
