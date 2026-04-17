@@ -151,7 +151,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-6 flex flex-col gap-2 px-1 text-xs text-muted-foreground/70 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-6 flex flex-col gap-2 text-xs text-muted-foreground/70 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Dusk³</p>
           <p>更像个人出版物，而不是默认模板。</p>
         </div>

@@ -14,6 +14,7 @@ import Link from "next/link";
 import { ReadingProgress } from "@/components/reading-progress";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { SeriesNav } from "@/components/series-nav";
+import { MobileBackHandle } from "@/components/mobile-back-handle";
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -93,9 +94,10 @@ export default async function PostPage({ params }: PostPageProps) {
   const readTime = Math.max(1, Math.ceil(wordCount / 500));
 
   return (
-    <div className="container mx-auto px-4 py-10">
+    <div className="container mx-auto px-5 py-10 sm:px-6 lg:px-8">
       <ReadingProgress />
       <ScrollToTop />
+      <MobileBackHandle />
       <div className="mx-auto flex max-w-6xl gap-12">
         <article className="min-w-0 flex-1">
           <header className="mb-8">

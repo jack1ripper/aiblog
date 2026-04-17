@@ -16,10 +16,14 @@ interface PostListRowProps {
 
 export function PostListRow({ post }: PostListRowProps) {
   return (
-    <li>
+    <li className="group relative">
+      <span
+        aria-hidden="true"
+        className="absolute left-2.5 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-muted-foreground/65 transition-colors duration-150 group-hover:bg-primary"
+      />
       <Link
         href={`/posts/${post.slug}`}
-        className="group flex items-center gap-2.5 rounded-md px-2 py-2 transition-colors duration-150 hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:outline-none"
+        className="flex min-w-0 items-center gap-2 rounded-md py-1.5 pr-2 pl-6 transition-colors duration-150 hover:bg-muted/35 focus-visible:bg-muted/35 focus-visible:outline-none"
       >
         <time className="w-16 shrink-0 text-[11px] font-medium tabular-nums text-muted-foreground sm:w-20 sm:text-xs">
           {format(new Date(post.createdAt), "MM.dd", { locale: zhCN })}
@@ -43,7 +47,7 @@ export function PostListRow({ post }: PostListRowProps) {
           </div>
         </div>
 
-        <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity duration-150 group-hover:opacity-100 sm:h-4 sm:w-4" />
+        <ArrowUpRight className="hidden h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity duration-150 group-hover:opacity-100 sm:block sm:h-4 sm:w-4" />
       </Link>
     </li>
   );

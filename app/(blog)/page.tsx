@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
-import { ArrowRight, FileText, Search } from "lucide-react";
+import { FileText, Search } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { PostListRow } from "@/components/post-list-row";
 
@@ -63,33 +63,7 @@ export default async function HomePage() {
 
   return (
     <div className="relative">
-      <section className="mx-auto w-full max-w-6xl px-4 pb-3 pt-6 sm:px-6 sm:pt-8 lg:px-8">
-        <div className="flex items-center justify-between pb-3">
-          <h1 className="inline-flex items-center gap-2 text-lg text-foreground/90 sm:text-2xl">
-            <span className="h-2 w-2 rounded-full bg-primary/70" />
-            <span className="font-semibold tracking-[-0.02em]">最新文章</span>
-          </h1>
-          <div className="flex items-center gap-2 text-xs sm:text-sm">
-            <span className="rounded-full border border-border/70 bg-background/80 px-2.5 py-1 text-muted-foreground sm:px-3 sm:py-1.5">
-              共 {posts.length} 篇
-            </span>
-            {featuredPost && (
-              <span className="hidden rounded-full border border-border/70 bg-background/80 px-3 py-1.5 text-muted-foreground sm:inline-flex">
-                最近更新 {format(new Date(featuredPost.createdAt), "yyyy.MM.dd", { locale: zhCN })}
-              </span>
-            )}
-            <Link
-              href="/archive"
-              className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-background/80 px-2.5 py-1 text-foreground transition-colors hover:bg-background sm:px-3 sm:py-1.5"
-            >
-              归档
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-6 lg:px-8">
+      <section className="mx-auto w-full max-w-6xl px-4 pt-6 pb-10 sm:px-6 sm:pt-8 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-12">
           <div className="lg:col-span-8">
             {posts.length === 0 ? (
@@ -102,8 +76,8 @@ export default async function HomePage() {
                 </p>
               </div>
             ) : (
-              <div className="rounded-xl border border-border/70 bg-card/55 p-1.5 sm:p-2">
-                <ul className="space-y-0.5">
+              <div className="rounded-xl border border-border/70 bg-card/60 px-2 py-2 sm:px-3">
+                <ul className="space-y-0.5 sm:space-y-1">
                   {posts.map((post) => (
                     <PostListRow key={post.id} post={post} />
                   ))}
@@ -115,6 +89,14 @@ export default async function HomePage() {
           <aside className="lg:col-span-4">
             <div className="space-y-4 lg:sticky lg:top-28">
               <section className="rounded-xl border border-sky-200/45 bg-[linear-gradient(145deg,rgba(255,255,255,0.82),rgba(240,249,255,0.9))] p-4 dark:border-sky-400/20 dark:bg-[linear-gradient(145deg,rgba(30,41,59,0.78),rgba(15,23,42,0.86))]">
+                <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
+                  <span>共 {posts.length} 篇</span>
+                  {featuredPost && (
+                    <span>
+                      更新于 {format(new Date(featuredPost.createdAt), "MM.dd", { locale: zhCN })}
+                    </span>
+                  )}
+                </div>
                 <h2 className="text-sm font-semibold text-foreground">站内搜索</h2>
                 <form action="/search" method="get" className="mt-3 flex gap-2">
                   <input
