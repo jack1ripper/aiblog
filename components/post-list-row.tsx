@@ -23,7 +23,7 @@ export function PostListRow({ post }: PostListRowProps) {
       />
       <Link
         href={`/posts/${post.slug}`}
-        className="flex w-full min-w-0 max-w-full items-center gap-2 rounded-md py-1.5 pr-2 pl-6 transition-colors duration-150 hover:bg-muted/35 focus-visible:bg-muted/35 focus-visible:outline-none"
+        className="flex w-full min-w-0 max-w-full items-center gap-2 rounded-md py-1.5 pr-3 pl-6 transition-colors duration-150 hover:bg-muted/35 focus-visible:bg-muted/35 focus-visible:outline-none"
       >
         <time className="w-16 shrink-0 text-[11px] font-medium tabular-nums text-muted-foreground sm:w-20 sm:text-xs">
           {format(new Date(post.createdAt), "MM.dd", { locale: zhCN })}

@@ -63,7 +63,7 @@ export default async function HomePage() {
 
   return (
     <div className="relative">
-      <section className="mx-auto w-full max-w-6xl px-5 pt-6 pb-10 sm:px-6 sm:pt-8 lg:px-8">
+      <section className="mx-auto w-full max-w-6xl pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-6 pb-10 sm:px-6 sm:pt-8 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <div className="mb-5 flex items-end justify-between">
