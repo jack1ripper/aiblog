@@ -46,7 +46,7 @@ function parseFrontMatter(raw: string): { data: FrontMatter; content: string } {
       const inner = value.slice(1, -1);
       value = inner
         .split(",")
-        .map((v) => {
+        .map((v: string) => {
           const s = v.trim();
           if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
             return s.slice(1, -1);
