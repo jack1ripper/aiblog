@@ -209,7 +209,7 @@ export default async function HomePage() {
                       <li key={post.id}>
                         <Link
                           href={`/posts/${post.slug}`}
-                          className="line-clamp-1 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
+                          className="block max-w-full truncate rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
                         >
                           {post.title}
                         </Link>
