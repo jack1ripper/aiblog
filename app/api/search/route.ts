@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const q = searchParams.get("q")?.trim() || "";
+  const q = (searchParams.get("q")?.trim() || "").slice(0, 100);
 
   if (!q) {
     return NextResponse.json({ posts: [] });
