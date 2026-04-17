@@ -67,61 +67,62 @@ export default async function HomePage() {
 
   return (
     <div className="relative">
-      <section className="safe-x mx-auto w-full max-w-6xl pt-6 pb-10 sm:pt-8">
-        <div className="grid gap-8 lg:grid-cols-12">
-          <div className="min-w-0 lg:col-span-8">
-            <div className="mb-5 flex min-w-0 items-end justify-between gap-4">
-              <div className="space-y-1">
-                <h1 className="text-xl font-semibold tracking-[-0.03em] text-foreground sm:text-2xl">
-                  最新文章
-                </h1>
-                <p className="text-xs text-muted-foreground sm:text-sm">
-                  共 {posts.length} 篇，首页默认展示最近 {visiblePosts.length} 篇
-                </p>
-              </div>
-              <Link
-                href="/archive"
-                className="inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground sm:text-sm"
-              >
-                查看归档
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-
-            {visiblePosts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-24 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                  <FileText className="h-5 w-5 text-muted-foreground" />
+      <section className="safe-x pt-6 pb-10 sm:pt-8">
+        <div className="mx-auto w-full max-w-6xl">
+          <div className="grid gap-8 lg:grid-cols-12">
+            <div className="min-w-0 lg:col-span-8">
+              <div className="mb-5 flex min-w-0 items-end justify-between gap-4">
+                <div className="min-w-0 space-y-1">
+                  <h1 className="text-xl font-semibold tracking-[-0.03em] text-foreground sm:text-2xl">
+                    最新文章
+                  </h1>
+                  <p className="text-xs text-muted-foreground sm:text-sm">
+                    共 {posts.length} 篇，首页默认展示最近 {visiblePosts.length} 篇
+                  </p>
                 </div>
-                <p className="mt-4 text-sm text-muted-foreground">
-                  暂无文章，稍后再来看看吧
-                </p>
+                <Link
+                  href="/archive"
+                  className="shrink-0 inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground sm:text-sm"
+                >
+                  查看归档
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
               </div>
-            ) : (
-              <div className="relative min-w-0 w-full overflow-hidden">
-                <span
-                  aria-hidden="true"
-                  className="absolute top-2 bottom-2 left-2.5 w-px bg-border/65"
-                />
-                <ul className="w-full space-y-0.5 sm:space-y-1">
-                  {visiblePosts.map((post) => (
-                    <PostListRow key={post.id} post={post} />
-                  ))}
-                </ul>
-                {hasMorePosts && (
-                  <div className="pt-4">
-                    <Link
-                      href="/archive"
-                      className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                      查看更多文章
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
+
+              {visiblePosts.length === 0 ? (
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-24 text-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                    <FileText className="h-5 w-5 text-muted-foreground" />
                   </div>
-                )}
-              </div>
-            )}
-          </div>
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    暂无文章，稍后再来看看吧
+                  </p>
+                </div>
+              ) : (
+                <div className="relative min-w-0 w-full overflow-hidden">
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-2 bottom-2 left-2.5 w-px bg-border/65"
+                  />
+                  <ul className="w-full space-y-0.5 sm:space-y-1">
+                    {visiblePosts.map((post) => (
+                      <PostListRow key={post.id} post={post} />
+                    ))}
+                  </ul>
+                  {hasMorePosts && (
+                    <div className="pt-4">
+                      <Link
+                        href="/archive"
+                        className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        查看更多文章
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
           <aside className="min-w-0 lg:col-span-4">
             <div className="space-y-4 lg:sticky lg:top-28">
@@ -222,6 +223,7 @@ export default async function HomePage() {
               </section>
             </div>
           </aside>
+          </div>
         </div>
       </section>
     </div>

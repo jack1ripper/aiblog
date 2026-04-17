@@ -23,13 +23,13 @@ export function PostListRow({ post }: PostListRowProps) {
       />
       <Link
         href={`/posts/${post.slug}`}
-        className="flex w-full min-w-0 max-w-full items-center gap-2 rounded-md py-1.5 pr-3 pl-6 transition-colors duration-150 hover:bg-muted/35 focus-visible:bg-muted/35 focus-visible:outline-none"
+        className="flex w-full min-w-0 max-w-full items-center gap-2 overflow-hidden rounded-md py-1.5 pr-3 pl-6 transition-colors duration-150 hover:bg-muted/35 focus-visible:bg-muted/35 focus-visible:outline-none"
       >
         <time className="w-16 shrink-0 text-[11px] font-medium tabular-nums text-muted-foreground sm:w-20 sm:text-xs">
           {format(new Date(post.createdAt), "MM.dd", { locale: zhCN })}
         </time>
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 overflow-hidden">
           <div className="flex min-w-0 items-center gap-1.5">
             <h2 className="min-w-0 flex-1 truncate text-sm font-medium text-foreground transition-colors duration-150 group-hover:text-primary sm:text-[15px]">
               {post.title}
@@ -40,7 +40,7 @@ export function PostListRow({ post }: PostListRowProps) {
               </span>
             )}
             {post.category && (
-              <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
+              <span className="hidden max-w-[10rem] shrink-0 truncate text-xs text-muted-foreground sm:inline">
                 · {post.category.name}
               </span>
             )}
