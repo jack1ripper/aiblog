@@ -55,7 +55,7 @@ export function Toc({ items }: TocProps) {
   if (headings.length === 0) return null;
 
   return (
-    <nav className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2">
+    <nav className="h-full overflow-y-auto pr-2">
       <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         目录
       </p>
