@@ -5,6 +5,8 @@ import { ArrowRight, FileText, Search } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { PostListRow } from "@/components/post-list-row";
 
+const HOME_PAGE_POST_LIMIT = 8;
+
 export default async function HomePage() {
   const [posts, latestPosts, categoriesRaw, tagsRaw] = await Promise.all([
     prisma.post.findMany({
@@ -52,6 +54,8 @@ export default async function HomePage() {
     .slice(0, 8);
 
   const featuredPost = posts[0];
+  const visiblePosts = posts.slice(0, HOME_PAGE_POST_LIMIT);
+  const hasMorePosts = posts.length > HOME_PAGE_POST_LIMIT;
   const yearMap = posts.reduce<Record<string, number>>((acc, post) => {
     const year = format(new Date(post.createdAt), "yyyy", { locale: zhCN });
     acc[year] = (acc[year] || 0) + 1;
@@ -72,7 +76,7 @@ export default async function HomePage() {
                   最新文章
                 </h1>
                 <p className="text-xs text-muted-foreground sm:text-sm">
-                  共 {posts.length} 篇，按时间排序展示
+                  共 {posts.length} 篇，首页默认展示最近 {visiblePosts.length} 篇
                 </p>
               </div>
               <Link
@@ -84,7 +88,7 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            {posts.length === 0 ? (
+            {visiblePosts.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-24 text-center">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                   <FileText className="h-5 w-5 text-muted-foreground" />
@@ -100,10 +104,21 @@ export default async function HomePage() {
                   className="absolute top-2 bottom-2 left-2.5 w-px bg-border/65"
                 />
                 <ul className="w-full space-y-0.5 sm:space-y-1">
-                  {posts.map((post) => (
+                  {visiblePosts.map((post) => (
                     <PostListRow key={post.id} post={post} />
                   ))}
                 </ul>
+                {hasMorePosts && (
+                  <div className="pt-4">
+                    <Link
+                      href="/archive"
+                      className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      查看更多文章
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
           </div>
