@@ -89,16 +89,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     }
   }
 
-  // Rebuild tags: disconnect all then reconnect
-  await prisma.post.update({
-    where: { id },
-    data: {
-      tags: {
-        set: [],
-      },
-    },
-  });
-
   const normalizedTagNames = normalizeTagNames(tagNames);
   const connectTags = normalizedTagNames.length
     ? {
@@ -119,22 +109,34 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       ? Math.max(0, Math.trunc(seriesOrder))
       : existingPost.seriesOrder;
 
-  const post = await prisma.post.update({
-    where: { id },
-    data: {
-      title: normalizedTitle,
-      slug,
-      content: normalizedContent,
-      excerpt: normalizedExcerpt,
-      coverImage: normalizedCoverImage,
-      published: normalizedPublished,
-      pinned: normalizedPinned,
-      seriesId: normalizedSeriesId,
-      seriesOrder: normalizedSeriesOrder,
-      categoryId: normalizedCategoryId,
-      tags: connectTags,
-    },
-    include: { category: true, tags: true },
+  const post = await prisma.$transaction(async (tx) => {
+    // Keep tag reset and reconnect in one transaction to avoid partial updates.
+    await tx.post.update({
+      where: { id },
+      data: {
+        tags: {
+          set: [],
+        },
+      },
+    });
+
+    return tx.post.update({
+      where: { id },
+      data: {
+        title: normalizedTitle,
+        slug,
+        content: normalizedContent,
+        excerpt: normalizedExcerpt,
+        coverImage: normalizedCoverImage,
+        published: normalizedPublished,
+        pinned: normalizedPinned,
+        seriesId: normalizedSeriesId,
+        seriesOrder: normalizedSeriesOrder,
+        categoryId: normalizedCategoryId,
+        tags: connectTags,
+      },
+      include: { category: true, tags: true },
+    });
   });
 
   if (shouldNotify) {
