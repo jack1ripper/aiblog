@@ -70,6 +70,8 @@ async function main() {
     data: {
       title: imported.title.slice(0, 180),
       slug: await ensureUniqueSlug(imported.slugBase || `import-${Date.now()}`),
+      sourceUrl: imported.sourceUrl,
+      sourceHost: imported.sourceHost,
       excerpt: imported.excerpt ? imported.excerpt.slice(0, 5000) : null,
       coverImage: imported.coverImage || null,
       content: `${imported.content}\n\n---\n\n原文链接：[${imported.sourceHost}](${imported.sourceUrl})`,

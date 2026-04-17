@@ -59,6 +59,8 @@ model Post {
   id                String    @id @default(cuid())
   title             String
   slug              String    @unique
+  sourceUrl         String?   @unique
+  sourceHost        String?
   content           String
   excerpt           String?
   coverImage        String?

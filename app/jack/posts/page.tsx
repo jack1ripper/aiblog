@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Table,
   TableBody,
@@ -34,15 +35,55 @@ interface ImportedPostResult {
   editPath: string;
 }
 
+interface ImportQuality {
+  score: number;
+  level: "high" | "medium" | "low";
+  issues: string[];
+  wordCount: number;
+  hasCoverImage: boolean;
+}
+
+interface ImportPreview {
+  sourceUrl: string;
+  sourceHost: string;
+  title: string;
+  excerpt: string;
+  coverImage: string;
+  content: string;
+  tagNames: string[];
+  quality: ImportQuality;
+}
+
+interface ImportDuplicate {
+  reason: "sourceUrl" | "title";
+  post: {
+    id: string;
+    title: string;
+    slug: string;
+    sourceUrl: string | null;
+  };
+}
+
 export default function AdminPostsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [publishingId, setPublishingId] = useState<string | null>(null);
+
   const [importUrl, setImportUrl] = useState("");
+  const [analyzing, setAnalyzing] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState("");
   const [importResult, setImportResult] = useState<ImportedPostResult | null>(null);
+
+  const [preview, setPreview] = useState<ImportPreview | null>(null);
+  const [duplicate, setDuplicate] = useState<ImportDuplicate | null>(null);
+
+  const [titleDraft, setTitleDraft] = useState("");
+  const [excerptDraft, setExcerptDraft] = useState("");
+  const [coverImageDraft, setCoverImageDraft] = useState("");
+  const [categoryDraft, setCategoryDraft] = useState("转载");
+  const [tagDraft, setTagDraft] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -110,7 +151,7 @@ export default function AdminPostsPage() {
     setPublishingId(null);
   }
 
-  async function handleImportFromUrl() {
+  async function handleAnalyzeUrl() {
     if (!importUrl.trim()) {
       setImportError("请先粘贴博客地址");
       return;
@@ -118,21 +159,71 @@ export default function AdminPostsPage() {
 
     setImportError("");
     setImportResult(null);
+    setAnalyzing(true);
+
+    try {
+      const res = await fetch("/api/admin/import-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "preview", url: importUrl.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "分析失败");
+      }
+
+      const fetchedPreview: ImportPreview = data.preview;
+      setPreview(fetchedPreview);
+      setDuplicate(data.duplicate || null);
+      setTitleDraft(fetchedPreview.title);
+      setExcerptDraft(fetchedPreview.excerpt || "");
+      setCoverImageDraft(fetchedPreview.coverImage || "");
+      setTagDraft(fetchedPreview.tagNames.join(", "));
+    } catch (err: unknown) {
+      setImportError(err instanceof Error ? err.message : "分析失败");
+    } finally {
+      setAnalyzing(false);
+    }
+  }
+
+  async function handleConfirmImport(forceImport = false) {
+    if (!preview) return;
+
+    setImportError("");
     setImporting(true);
 
     try {
       const res = await fetch("/api/admin/import-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: importUrl.trim(), published: false }),
+        body: JSON.stringify({
+          mode: "import",
+          url: preview.sourceUrl,
+          title: titleDraft,
+          excerpt: excerptDraft,
+          coverImage: coverImageDraft,
+          categoryName: categoryDraft,
+          tagNames: tagDraft
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean),
+          content: preview.content,
+          published: false,
+          forceImport,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
+        if (res.status === 409 && data.duplicate) {
+          setDuplicate(data.duplicate);
+        }
         throw new Error(data.error || "导入失败");
       }
 
       setImportResult(data);
       setImportUrl("");
+      setPreview(null);
+      setDuplicate(null);
       setPosts((prev) => [
         {
           id: data.id,
@@ -151,6 +242,13 @@ export default function AdminPostsPage() {
     }
   }
 
+  const qualityLabel = useMemo(() => {
+    if (!preview) return "";
+    if (preview.quality.level === "high") return "高质量";
+    if (preview.quality.level === "medium") return "中等质量";
+    return "低质量";
+  }, [preview]);
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -159,7 +257,7 @@ export default function AdminPostsPage() {
           <Skeleton className="h-9 w-24" />
         </div>
         <div className="rounded-md border">
-          <div className="p-4 space-y-3">
+          <div className="space-y-3 p-4">
             <Skeleton className="h-6 w-full" />
             <Skeleton className="h-6 w-full" />
             <Skeleton className="h-6 w-full" />
@@ -186,9 +284,9 @@ export default function AdminPostsPage() {
 
       <div className="rounded-md border bg-muted/20 p-4">
         <div className="mb-3 space-y-1">
-          <h2 className="text-sm font-semibold">URL 自动导入</h2>
+          <h2 className="text-sm font-semibold">URL 自动导入（分析后确认）</h2>
           <p className="text-xs text-muted-foreground">
-            粘贴文章链接后，系统会自动抓取正文并保存为草稿，你可以再进入编辑器二次润色。
+            先分析抓取质量与重复风险，再确认导入草稿，避免错误或重复入库。
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -198,13 +296,82 @@ export default function AdminPostsPage() {
             placeholder="https://example.com/blog/post"
             className="flex-1"
           />
-          <Button onClick={handleImportFromUrl} disabled={importing}>
-            {importing ? "导入中..." : "导入为草稿"}
+          <Button onClick={handleAnalyzeUrl} disabled={analyzing}>
+            {analyzing ? "分析中..." : "分析链接"}
           </Button>
         </div>
-        {importError && (
-          <p className="mt-2 text-xs text-destructive">{importError}</p>
+
+        {importError && <p className="mt-2 text-xs text-destructive">{importError}</p>}
+
+        {preview && (
+          <div className="mt-4 space-y-3 rounded-md border bg-background p-4">
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <Badge variant={preview.quality.level === "low" ? "destructive" : "secondary"}>
+                质量分 {preview.quality.score}
+              </Badge>
+              <span className="text-muted-foreground">{qualityLabel}</span>
+              <span className="text-muted-foreground">约 {preview.quality.wordCount} 字</span>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-xs text-muted-foreground">标题</label>
+                <Input value={titleDraft} onChange={(e) => setTitleDraft(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs text-muted-foreground">分类</label>
+                <Input value={categoryDraft} onChange={(e) => setCategoryDraft(e.target.value)} />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs text-muted-foreground">摘要</label>
+              <Textarea value={excerptDraft} onChange={(e) => setExcerptDraft(e.target.value)} rows={3} />
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-xs text-muted-foreground">封面链接</label>
+                <Input value={coverImageDraft} onChange={(e) => setCoverImageDraft(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs text-muted-foreground">标签（逗号分隔）</label>
+                <Input value={tagDraft} onChange={(e) => setTagDraft(e.target.value)} />
+              </div>
+            </div>
+
+            {preview.quality.issues.length > 0 && (
+              <div className="space-y-1 text-xs text-muted-foreground">
+                {preview.quality.issues.map((item) => (
+                  <p key={item}>- {item}</p>
+                ))}
+              </div>
+            )}
+
+            {duplicate && (
+              <Alert variant={duplicate.reason === "sourceUrl" ? "destructive" : "default"}>
+                <AlertDescription>
+                  {duplicate.reason === "sourceUrl" ? "检测到同源文章已存在：" : "检测到同标题文章："}
+                  <Link href={`/jack/posts/${duplicate.post.id}/edit`} className="ml-1 underline underline-offset-2">
+                    {duplicate.post.title}
+                  </Link>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={() => handleConfirmImport(false)} disabled={importing}>
+                {importing ? "导入中..." : "确认导入草稿"}
+              </Button>
+              {duplicate?.reason === "sourceUrl" && (
+                <Button variant="outline" onClick={() => handleConfirmImport(true)} disabled={importing}>
+                  强制导入副本
+                </Button>
+              )}
+            </div>
+          </div>
         )}
+
         {importResult && (
           <p className="mt-2 text-xs text-muted-foreground">
             导入成功：{importResult.title}。

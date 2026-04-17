@@ -4,6 +4,27 @@ const FETCH_TIMEOUT_MS = 15000;
 const DEFAULT_USER_AGENT =
   "Mozilla/5.0 (compatible; AIBlogImporter/1.0; +https://example.com/bot)";
 
+const TRACKING_PARAMS = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_term",
+  "utm_content",
+  "spm",
+  "from",
+  "fbclid",
+  "gclid",
+  "igshid",
+];
+
+export interface ImportQuality {
+  score: number;
+  level: "high" | "medium" | "low";
+  issues: string[];
+  wordCount: number;
+  hasCoverImage: boolean;
+}
+
 export interface ImportedPostDraft {
   sourceUrl: string;
   sourceHost: string;
@@ -13,6 +34,18 @@ export interface ImportedPostDraft {
   coverImage: string;
   content: string;
   tagNames: string[];
+  quality: ImportQuality;
+}
+
+export interface ImportedPostPreview {
+  sourceUrl: string;
+  sourceHost: string;
+  title: string;
+  excerpt: string;
+  coverImage: string;
+  content: string;
+  tagNames: string[];
+  quality: ImportQuality;
 }
 
 function decodeHtmlEntities(input: string): string {
@@ -28,16 +61,16 @@ function decodeHtmlEntities(input: string): string {
     hellip: "...",
   };
 
-  return input.replace(/&(#x?[0-9a-fA-F]+|[a-zA-Z]+);/g, (_, entity: string) => {
+  return input.replace(/&(#x?[0-9a-fA-F]+|[a-zA-Z]+);/g, (raw, entity: string) => {
     if (entity.startsWith("#x") || entity.startsWith("#X")) {
       const code = parseInt(entity.slice(2), 16);
-      return Number.isFinite(code) ? String.fromCodePoint(code) : _;
+      return Number.isFinite(code) ? String.fromCodePoint(code) : raw;
     }
     if (entity.startsWith("#")) {
       const code = parseInt(entity.slice(1), 10);
-      return Number.isFinite(code) ? String.fromCodePoint(code) : _;
+      return Number.isFinite(code) ? String.fromCodePoint(code) : raw;
     }
-    return namedEntities[entity] ?? _;
+    return namedEntities[entity] ?? raw;
   });
 }
 
@@ -54,10 +87,30 @@ function resolveUrl(raw: string | undefined, baseUrl: string): string {
   const normalized = raw.trim();
   if (!normalized) return "";
   try {
-    return new URL(normalized, baseUrl).toString();
+    return normalizeSourceUrl(new URL(normalized, baseUrl).toString());
   } catch {
     return "";
   }
+}
+
+export function normalizeSourceUrl(rawUrl: string): string {
+  const parsed = new URL(rawUrl);
+  parsed.hash = "";
+  TRACKING_PARAMS.forEach((key) => parsed.searchParams.delete(key));
+
+  const searchKeys = Array.from(parsed.searchParams.keys()).sort();
+  const reordered = new URLSearchParams();
+  searchKeys.forEach((key) => {
+    const value = parsed.searchParams.get(key);
+    if (value !== null) reordered.set(key, value);
+  });
+  parsed.search = reordered.toString();
+
+  if (parsed.pathname !== "/" && parsed.pathname.endsWith("/")) {
+    parsed.pathname = parsed.pathname.slice(0, -1);
+  }
+
+  return parsed.toString();
 }
 
 function extractMeta(html: string, keys: string[]): string {
@@ -70,6 +123,10 @@ function extractMeta(html: string, keys: string[]): string {
       ),
       new RegExp(
         `<meta[^>]+content=["']([\\s\\S]*?)["'][^>]+(?:name|property)=["']${escaped}["'][^>]*>`,
+        "i"
+      ),
+      new RegExp(
+        `<meta[^>]+(?:name|property)=["']${escaped}["'][^>]+content=([^\\s>]+)[^>]*>`,
         "i"
       ),
     ];
@@ -139,18 +196,15 @@ function extractMainHtml(html: string): string {
 }
 
 function extractPreCodeBlocks(html: string): string {
-  return html.replace(
-    /<pre\b[^>]*>([\s\S]*?)<\/pre>/gi,
-    (_, preInner: string) => {
-      const codeMatch = preInner.match(/<code\b([^>]*)>([\s\S]*?)<\/code>/i);
-      const attrs = codeMatch?.[1] || "";
-      const codeRaw = codeMatch?.[2] || preInner;
-      const langMatch = attrs.match(/language-([a-zA-Z0-9_-]+)/i);
-      const lang = langMatch?.[1] || "";
-      const code = decodeHtmlEntities(codeRaw.replace(/<[^>]+>/g, "")).replace(/\r/g, "").trim();
-      return `\n\n\`\`\`${lang}\n${code}\n\`\`\`\n\n`;
-    }
-  );
+  return html.replace(/<pre\b[^>]*>([\s\S]*?)<\/pre>/gi, (_raw, preInner: string) => {
+    const codeMatch = preInner.match(/<code\b([^>]*)>([\s\S]*?)<\/code>/i);
+    const attrs = codeMatch?.[1] || "";
+    const codeRaw = codeMatch?.[2] || preInner;
+    const langMatch = attrs.match(/language-([a-zA-Z0-9_-]+)/i);
+    const lang = langMatch?.[1] || "";
+    const code = decodeHtmlEntities(codeRaw.replace(/<[^>]+>/g, "")).replace(/\r/g, "").trim();
+    return `\n\n\`\`\`${lang}\n${code}\n\`\`\`\n\n`;
+  });
 }
 
 function htmlToMarkdown(html: string, baseUrl: string): string {
@@ -159,15 +213,14 @@ function htmlToMarkdown(html: string, baseUrl: string): string {
     .replace(/<(script|style|noscript|svg|nav|header|footer|form|iframe)[\s\S]*?<\/\1>/gi, " ");
 
   output = extractPreCodeBlocks(output);
-
   output = output.replace(/<br\s*\/?>/gi, "\n");
 
-  output = output.replace(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi, (_, level: string, inner: string) => {
+  output = output.replace(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi, (_m, level: string, inner: string) => {
     const text = stripTags(inner);
     return text ? `\n\n${"#".repeat(Number(level))} ${text}\n\n` : "\n\n";
   });
 
-  output = output.replace(/<blockquote\b[^>]*>([\s\S]*?)<\/blockquote>/gi, (_, inner: string) => {
+  output = output.replace(/<blockquote\b[^>]*>([\s\S]*?)<\/blockquote>/gi, (_m, inner: string) => {
     const lines = stripTags(inner)
       .split(/\n+/)
       .map((line) => line.trim())
@@ -185,7 +238,7 @@ function htmlToMarkdown(html: string, baseUrl: string): string {
     return `\n\n![${alt}](${resolved})\n\n`;
   });
 
-  output = output.replace(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (_, href: string, inner: string) => {
+  output = output.replace(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (_m, href: string, inner: string) => {
     const text = stripTags(inner);
     const resolved = resolveUrl(href, baseUrl);
     if (!text) return resolved || "";
@@ -194,10 +247,10 @@ function htmlToMarkdown(html: string, baseUrl: string): string {
   });
 
   output = output
-    .replace(/<(strong|b)\b[^>]*>([\s\S]*?)<\/\1>/gi, (_m: string, _tag: string, inner: string) => `**${stripTags(inner)}**`)
-    .replace(/<(em|i)\b[^>]*>([\s\S]*?)<\/\1>/gi, (_m: string, _tag: string, inner: string) => `*${stripTags(inner)}*`);
+    .replace(/<(strong|b)\b[^>]*>([\s\S]*?)<\/\1>/gi, (_m, _tag, inner: string) => `**${stripTags(inner)}**`)
+    .replace(/<(em|i)\b[^>]*>([\s\S]*?)<\/\1>/gi, (_m, _tag, inner: string) => `*${stripTags(inner)}*`);
 
-  output = output.replace(/<li\b[^>]*>([\s\S]*?)<\/li>/gi, (_, inner: string) => {
+  output = output.replace(/<li\b[^>]*>([\s\S]*?)<\/li>/gi, (_m, inner: string) => {
     const text = stripTags(inner);
     return text ? `\n- ${text}` : "";
   });
@@ -221,7 +274,9 @@ function extractTagNames(html: string): string[] {
     .map((item) => item.trim())
     .filter(Boolean);
 
-  const articleTags = [...html.matchAll(/<meta[^>]+property=["']article:tag["'][^>]+content=["']([^"']+)["'][^>]*>/gi)]
+  const articleTags = [
+    ...html.matchAll(/<meta[^>]+property=["']article:tag["'][^>]+content=["']([^"']+)["'][^>]*>/gi),
+  ]
     .map((m) => decodeHtmlEntities(m[1]).trim())
     .filter(Boolean);
 
@@ -237,6 +292,53 @@ function extractExcerpt(html: string): string {
   return main.slice(0, 220);
 }
 
+function evaluateImportQuality(input: {
+  title: string;
+  excerpt: string;
+  content: string;
+  coverImage: string;
+}): ImportQuality {
+  const issues: string[] = [];
+  const wordCount = input.content.replace(/[#*_`\-\[\]()!>]/g, "").replace(/\s+/g, "").length;
+
+  let score = 100;
+  if (input.title.trim().length < 8) {
+    score -= 12;
+    issues.push("标题过短，建议手动优化标题");
+  }
+  if (input.excerpt.trim().length < 30) {
+    score -= 10;
+    issues.push("摘要偏短，建议补充摘要");
+  }
+  if (wordCount < 800) {
+    score -= 30;
+    issues.push("正文较短，可能抓取不完整");
+  }
+  if (wordCount < 1500) {
+    score -= 10;
+  }
+  if (!input.coverImage) {
+    score -= 8;
+    issues.push("未检测到封面图");
+  }
+  if ((input.content.match(/\n```/g) || []).length % 2 !== 0) {
+    score -= 10;
+    issues.push("代码块可能不完整");
+  }
+
+  const normalizedScore = Math.max(0, Math.min(100, score));
+  const level: ImportQuality["level"] =
+    normalizedScore >= 80 ? "high" : normalizedScore >= 60 ? "medium" : "low";
+
+  return {
+    score: normalizedScore,
+    level,
+    issues,
+    wordCount,
+    hasCoverImage: Boolean(input.coverImage),
+  };
+}
+
 export async function importPostFromUrl(rawUrl: string): Promise<ImportedPostDraft> {
   let sourceUrl = "";
   try {
@@ -244,7 +346,7 @@ export async function importPostFromUrl(rawUrl: string): Promise<ImportedPostDra
     if (!["http:", "https:"].includes(url.protocol)) {
       throw new Error("仅支持 http/https 链接");
     }
-    sourceUrl = url.toString();
+    sourceUrl = normalizeSourceUrl(url.toString());
   } catch {
     throw new Error("请输入有效的博客链接");
   }
@@ -278,6 +380,7 @@ export async function importPostFromUrl(rawUrl: string): Promise<ImportedPostDra
   const excerpt = extractExcerpt(html);
   const coverImage = resolveUrl(extractMeta(html, ["og:image", "twitter:image"]), sourceUrl);
   const sourceHost = parsedUrl.hostname.replace(/^www\./, "");
+  const quality = evaluateImportQuality({ title, excerpt, content, coverImage });
 
   return {
     sourceUrl,
@@ -288,5 +391,6 @@ export async function importPostFromUrl(rawUrl: string): Promise<ImportedPostDra
     coverImage,
     content,
     tagNames: extractTagNames(html),
+    quality,
   };
 }
