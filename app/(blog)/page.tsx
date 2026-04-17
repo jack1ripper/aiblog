@@ -94,12 +94,12 @@ export default async function HomePage() {
                 </p>
               </div>
             ) : (
-              <div className="relative">
+              <div className="relative w-full overflow-hidden">
                 <span
                   aria-hidden="true"
                   className="absolute top-2 bottom-2 left-2.5 w-px bg-border/65"
                 />
-                <ul className="space-y-0.5 sm:space-y-1">
+                <ul className="w-full space-y-0.5 sm:space-y-1">
                   {posts.map((post) => (
                     <PostListRow key={post.id} post={post} />
                   ))}

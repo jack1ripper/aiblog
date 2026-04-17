@@ -76,7 +76,7 @@ export function Header() {
         isVisible ? "translate-y-0" : "-translate-y-[calc(100%+1rem)]"
       }`}
     >
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 rounded-[22px] border border-white/45 bg-white/68 px-4 py-3 shadow-[0_10px_28px_rgba(15,23,42,0.08)] backdrop-blur-[14px] dark:border-white/10 dark:bg-white/8 dark:shadow-[0_10px_28px_rgba(0,0,0,0.22)]">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 rounded-[22px] border border-sky-200/55 bg-[linear-gradient(135deg,rgba(255,255,255,0.72),rgba(239,246,255,0.66))] px-4 py-3 shadow-[0_10px_28px_rgba(15,23,42,0.08)] backdrop-blur-[16px] dark:border-sky-400/20 dark:bg-[linear-gradient(135deg,rgba(30,41,59,0.72),rgba(15,23,42,0.62))] dark:shadow-[0_10px_28px_rgba(0,0,0,0.22)]">
         <Link href="/" className="flex min-w-0 items-center gap-3 text-lg font-semibold tracking-[-0.03em]">
           <span className="flex h-10 w-10 items-center justify-center rounded-[18px] border border-white/55 bg-white/60 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] dark:border-white/12 dark:bg-white/8 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]">
             <Code2 className="h-4 w-4" />

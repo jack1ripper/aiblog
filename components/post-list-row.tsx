@@ -16,22 +16,22 @@ interface PostListRowProps {
 
 export function PostListRow({ post }: PostListRowProps) {
   return (
-    <li className="group relative">
+    <li className="group relative w-full max-w-full overflow-hidden">
       <span
         aria-hidden="true"
         className="absolute left-2.5 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-muted-foreground/65 transition-colors duration-150 group-hover:bg-primary"
       />
       <Link
         href={`/posts/${post.slug}`}
-        className="flex min-w-0 items-center gap-2 rounded-md py-1.5 pr-2 pl-6 transition-colors duration-150 hover:bg-muted/35 focus-visible:bg-muted/35 focus-visible:outline-none"
+        className="flex w-full min-w-0 max-w-full items-center gap-2 rounded-md py-1.5 pr-2 pl-6 transition-colors duration-150 hover:bg-muted/35 focus-visible:bg-muted/35 focus-visible:outline-none"
       >
         <time className="w-16 shrink-0 text-[11px] font-medium tabular-nums text-muted-foreground sm:w-20 sm:text-xs">
           {format(new Date(post.createdAt), "MM.dd", { locale: zhCN })}
         </time>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            <h2 className="truncate text-sm font-medium text-foreground transition-colors duration-150 group-hover:text-primary sm:text-[15px]">
+          <div className="flex min-w-0 items-center gap-1.5">
+            <h2 className="min-w-0 flex-1 truncate text-sm font-medium text-foreground transition-colors duration-150 group-hover:text-primary sm:text-[15px]">
               {post.title}
             </h2>
             {post.pinned && (
