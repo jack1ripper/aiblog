@@ -210,7 +210,7 @@ export default async function PostPage({ params }: PostPageProps) {
           <GiscusComments />
         </article>
 
-        <aside className="hidden w-56 shrink-0 xl:block">
+        <aside className="hidden w-56 shrink-0 xl:sticky xl:top-24 xl:block xl:self-start">
           <Toc />
         </aside>
       </div>
