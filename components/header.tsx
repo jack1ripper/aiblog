@@ -72,7 +72,7 @@ export function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full px-4 pt-4 transition-transform duration-300 ease-out sm:px-6 lg:px-8 ${
+      className={`sticky top-0 z-50 w-full px-5 pt-4 transition-transform duration-300 ease-out sm:px-6 lg:px-8 ${
         isVisible ? "translate-y-0" : "-translate-y-[calc(100%+1rem)]"
       }`}
     >

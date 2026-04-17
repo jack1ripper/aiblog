@@ -16,7 +16,7 @@ export default async function BlogLayout({
       <PageViewTracker />
       <Header />
       <SiteBanners banners={banners} />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 overflow-x-hidden">{children}</main>
       <SiteFooter />
     </>
   );
