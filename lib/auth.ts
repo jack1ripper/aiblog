@@ -36,6 +36,13 @@ function isRateLimited(key: string, maxAttempts = 5, windowMs = 15 * 60 * 1000):
 function getClientIp(req: unknown): string | null {
   if (!req) return null;
   const r = req as { headers?: Record<string, unknown>; socket?: { remoteAddress?: string } };
+  const realIp = r.headers?.["x-real-ip"];
+  if (typeof realIp === "string" && realIp.trim()) {
+    return realIp.trim();
+  }
+  if (Array.isArray(realIp) && typeof realIp[0] === "string" && realIp[0].trim()) {
+    return realIp[0].trim();
+  }
   const forwarded = r.headers?.["x-forwarded-for"];
   if (forwarded) {
     return typeof forwarded === "string"

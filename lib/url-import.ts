@@ -1,6 +1,9 @@
+import { lookup } from "node:dns/promises";
+import net from "node:net";
 import { generateSlug } from "./slug";
 
 const FETCH_TIMEOUT_MS = 15000;
+const MAX_REDIRECTS = 5;
 const DEFAULT_USER_AGENT =
   "Mozilla/5.0 (compatible; AIBlogImporter/1.0; +https://example.com/bot)";
 
@@ -46,6 +49,119 @@ export interface ImportedPostPreview {
   content: string;
   tagNames: string[];
   quality: ImportQuality;
+}
+
+function isLocalHostname(hostname: string): boolean {
+  const normalized = hostname.trim().toLowerCase();
+  return (
+    normalized === "localhost" ||
+    normalized.endsWith(".localhost") ||
+    normalized === "0.0.0.0" ||
+    normalized === "[::1]"
+  );
+}
+
+function isPrivateIpv4(ip: string): boolean {
+  const parts = ip.split(".").map((part) => Number(part));
+  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) {
+    return true;
+  }
+
+  const [a, b] = parts;
+  return (
+    a === 0 ||
+    a === 10 ||
+    a === 127 ||
+    (a === 100 && b >= 64 && b <= 127) ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168) ||
+    a >= 224
+  );
+}
+
+function isPrivateIpv6(ip: string): boolean {
+  const normalized = ip.toLowerCase();
+  return (
+    normalized === "::1" ||
+    normalized === "::" ||
+    normalized.startsWith("fc") ||
+    normalized.startsWith("fd") ||
+    normalized.startsWith("fe80:") ||
+    normalized.startsWith("::ffff:127.") ||
+    normalized.startsWith("::ffff:10.") ||
+    normalized.startsWith("::ffff:192.168.") ||
+    /^::ffff:172\.(1[6-9]|2\d|3[01])\./.test(normalized)
+  );
+}
+
+function isPrivateIp(ip: string): boolean {
+  const ipVersion = net.isIP(ip);
+  if (ipVersion === 4) return isPrivateIpv4(ip);
+  if (ipVersion === 6) return isPrivateIpv6(ip);
+  return true;
+}
+
+async function assertPublicTarget(rawUrl: string) {
+  const url = new URL(rawUrl);
+  const hostname = url.hostname;
+
+  if (isLocalHostname(hostname)) {
+    throw new Error("不允许抓取本机或内网地址");
+  }
+
+  const directIpVersion = net.isIP(hostname);
+  if (directIpVersion) {
+    if (isPrivateIp(hostname)) {
+      throw new Error("不允许抓取本机或内网地址");
+    }
+    return;
+  }
+
+  const records = await lookup(hostname, { all: true, verbatim: true });
+  if (records.length === 0) {
+    throw new Error("目标域名解析失败");
+  }
+
+  if (records.some((record) => isPrivateIp(record.address))) {
+    throw new Error("不允许抓取本机或内网地址");
+  }
+}
+
+async function fetchImportTarget(initialUrl: string): Promise<{ html: string; sourceUrl: string }> {
+  let currentUrl = initialUrl;
+
+  for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount++) {
+    await assertPublicTarget(currentUrl);
+
+    const response = await fetch(currentUrl, {
+      headers: {
+        "user-agent": DEFAULT_USER_AGENT,
+        accept: "text/html,application/xhtml+xml",
+      },
+      redirect: "manual",
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    });
+
+    if ([301, 302, 303, 307, 308].includes(response.status)) {
+      const location = response.headers.get("location");
+      if (!location) {
+        throw new Error("目标站点返回了无效重定向");
+      }
+
+      currentUrl = normalizeSourceUrl(new URL(location, currentUrl).toString());
+      continue;
+    }
+
+    if (!response.ok) {
+      throw new Error(`抓取失败（HTTP ${response.status}）`);
+    }
+
+    const html = await response.text();
+    return { html, sourceUrl: currentUrl };
+  }
+
+  throw new Error("重定向次数过多，请检查目标链接");
 }
 
 function decodeHtmlEntities(input: string): string {
@@ -351,19 +467,9 @@ export async function importPostFromUrl(rawUrl: string): Promise<ImportedPostDra
     throw new Error("请输入有效的博客链接");
   }
 
-  const response = await fetch(sourceUrl, {
-    headers: {
-      "user-agent": DEFAULT_USER_AGENT,
-      accept: "text/html,application/xhtml+xml",
-    },
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-  });
-
-  if (!response.ok) {
-    throw new Error(`抓取失败（HTTP ${response.status}）`);
-  }
-
-  const html = await response.text();
+  const fetched = await fetchImportTarget(sourceUrl);
+  const html = fetched.html;
+  sourceUrl = fetched.sourceUrl;
   if (!html || !/<html/i.test(html)) {
     throw new Error("目标页面不是可解析的 HTML");
   }
