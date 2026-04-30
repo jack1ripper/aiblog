@@ -51,3 +51,6 @@ public/uploads/
 
 # claude local config
 .claude/
+
+# jetbrains
+.idea/
