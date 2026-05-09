@@ -1,3 +1,5 @@
+export const revalidate = 60;
+
 import { prisma } from "@/lib/prisma";
 
 function escapeXml(unsafe: string): string {

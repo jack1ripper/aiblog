@@ -1,3 +1,5 @@
+export const revalidate = 60;
+
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { format } from "date-fns";

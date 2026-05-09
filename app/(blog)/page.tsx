@@ -1,3 +1,5 @@
+export const revalidate = 60;
+
 import Link from "next/link";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";

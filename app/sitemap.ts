@@ -1,3 +1,5 @@
+export const revalidate = 60;
+
 import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
