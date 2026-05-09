@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { ensureUniqueSlug } from "@/lib/slug";
 import { importPostFromUrl } from "@/lib/url-import";
+
+function revalidatePostPaths(slug: string) {
+  revalidatePath("/");
+  revalidatePath("/archive");
+  revalidatePath(`/posts/${slug}`);
+  revalidatePath("/feed.xml");
+  revalidatePath("/feed.json");
+  revalidatePath("/sitemap.xml");
+}
 
 type ImportMode = "preview" | "import";
 
@@ -165,6 +175,10 @@ export async function POST(req: NextRequest) {
       },
       include: { tags: true, category: true },
     });
+
+    if (post.published) {
+      revalidatePostPaths(post.slug);
+    }
 
     return NextResponse.json(
       {

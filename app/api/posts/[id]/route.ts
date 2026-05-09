@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { generateSlug, ensureUniqueSlug } from "@/lib/slug";
 import { notifySubscribersOnPublish } from "@/lib/email";
+
+function revalidatePostPaths(slug: string) {
+  revalidatePath("/");
+  revalidatePath("/archive");
+  revalidatePath(`/posts/${slug}`);
+  revalidatePath("/feed.xml");
+  revalidatePath("/feed.json");
+  revalidatePath("/sitemap.xml");
+}
 
 function normalizeStringField(value: unknown, maxLength = 5000): string | undefined {
   if (typeof value !== "string") return undefined;
@@ -139,6 +149,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     });
   });
 
+  revalidatePostPaths(post.slug);
+  if (slug !== existingPost.slug) {
+    revalidatePath(`/posts/${existingPost.slug}`);
+  }
+
   if (shouldNotify) {
     try {
       const newsletter = await notifySubscribersOnPublish(post);
@@ -165,5 +180,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   }
 
   await prisma.post.delete({ where: { id } });
+
+  if (existing.published) {
+    revalidatePostPaths(existing.slug);
+  }
+
   return NextResponse.json({ success: true });
 }

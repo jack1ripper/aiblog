@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { generateSlug, ensureUniqueSlug } from "@/lib/slug";
 import { notifySubscribersOnPublish } from "@/lib/email";
+
+function revalidatePostPaths(slug: string) {
+  revalidatePath("/");
+  revalidatePath("/archive");
+  revalidatePath(`/posts/${slug}`);
+  revalidatePath("/feed.xml");
+  revalidatePath("/feed.json");
+  revalidatePath("/sitemap.xml");
+}
 
 const MAX_PAGE_SIZE = 50;
 
@@ -139,6 +149,10 @@ export async function POST(req: NextRequest) {
     },
     include: { category: true, tags: true },
   });
+
+  if (post.published) {
+    revalidatePostPaths(post.slug);
+  }
 
   if (post.published && !post.newsletterSentAt) {
     try {
